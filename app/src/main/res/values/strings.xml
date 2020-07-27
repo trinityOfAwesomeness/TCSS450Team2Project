@@ -1,13 +1,19 @@
 <resources>
     <string name="app_name">TCSS450Team2Project</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- sharedPreferences strings -->
     <string name="LOGIN_PREFS">edu.tacoma.uw.PREFS</string>
     <string name="LOGGEDIN">loggedin</string>
+
+    <!-- menu strings -->
     <string name="action_logout">Sign Out</string>
 
+    <!-- CreateAccountFragment strings -->
+    <string name="title">CREATE ACCOUNT</string>
     <string name="first_name_hint">First Name</string>
     <string name="last_name_hint">Last Name</string>
     <string name="user_name_hint">User Name</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
+    <string name="sign_up_btn">SIGN UP</string>
 </resources>

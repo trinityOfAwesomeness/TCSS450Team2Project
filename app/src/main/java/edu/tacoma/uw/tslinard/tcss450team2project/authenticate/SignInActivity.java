@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.MainMenuActivity;
@@ -26,9 +25,12 @@ import edu.tacoma.uw.tslinard.tcss450team2project.main.MainMenuActivity;
 public class SignInActivity extends AppCompatActivity
         implements LoginFragment.LoginFragmentListener, CreateAccountFragment.CreateAccountListener {
 
+    public static final String SIGNIN_MESSAGE = "SIGNIN_MESSAGE";
+
     private SharedPreferences mSharedPreferences;
-    private List<Account> mAccountList;
-    private JSONObject mRegisterJSON;
+    private JSONObject mCreateAccountJSON;
+    private JSONObject mLoginJSON;
+    private boolean mLoginMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,32 +52,60 @@ public class SignInActivity extends AppCompatActivity
 
     @Override
     public void login(String email, String pwd) {
-        Toast.makeText(getApplicationContext(),email + ": " + pwd, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),email + ": " + pwd, Toast.LENGTH_SHORT).show();
+        mLoginMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.login));
+        mLoginJSON = new JSONObject();
+        try{
+            mLoginJSON.put(Account.EMAIL, email);
+            mLoginJSON.put(Account.PASSWORD, pwd);
+            new SignInAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on creating an account: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchMain(){
         mSharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), true).commit();
         Intent intent = new Intent(this, MainMenuActivity.class);
+        try {
+            intent.putExtra(SIGNIN_MESSAGE, mLoginJSON.getString(Account.EMAIL));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void launchCreateAccountFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.sign_in_fragment_id, new CreateAccountFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
     public void createAccount(Account account) {
         StringBuilder url = new StringBuilder(getString(R.string.register));
 
-        mRegisterJSON = new JSONObject();
+        mCreateAccountJSON = new JSONObject();
         try{
-            mRegisterJSON.put(Account.FIRST_NAME, account.getFirstName());
-            mRegisterJSON.put(Account.LAST_NAME, account.getLastName());
-            mRegisterJSON.put(Account.USER_NAME, account.getUserName());
-            mRegisterJSON.put(Account.EMAIL, account.getEmail());
-            mRegisterJSON.put(Account.PASSWORD, account.getPassword());
-            new CreateAccountAsyncTask().execute(url.toString());
+            mCreateAccountJSON.put(Account.FIRST_NAME, account.getFirstName());
+            mCreateAccountJSON.put(Account.LAST_NAME, account.getLastName());
+            mCreateAccountJSON.put(Account.USER_NAME, account.getUserName());
+            mCreateAccountJSON.put(Account.EMAIL, account.getEmail());
+            mCreateAccountJSON.put(Account.PASSWORD, account.getPassword());
+            new SignInAsyncTask().execute(url.toString());
         } catch (JSONException e){
             Toast.makeText(this, "Error with JSON creation on creating an account: "
                             + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class CreateAccountAsyncTask extends AsyncTask<String, Void, String> {
+    private class SignInAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
             String response = "";
@@ -90,9 +120,11 @@ public class SignInActivity extends AppCompatActivity
                     OutputStreamWriter wr =
                             new OutputStreamWriter(urlConnection.getOutputStream());
 
-                    // For Debugging
-                  //  Log.i(ADD_COURSE, mCourseJSON.toString());
-                    wr.write(mRegisterJSON.toString());
+                    if(!mLoginMode){
+                        wr.write(mCreateAccountJSON.toString());
+                    } else {
+                        wr.write(mLoginJSON.toString());
+                    }
                     wr.flush();
                     wr.close();
 
@@ -105,8 +137,13 @@ public class SignInActivity extends AppCompatActivity
                     }
 
                 } catch (Exception e) {
-                    response = "Unable to add the new account, Reason: "
-                            + e.getMessage();
+                    if(!mLoginMode){
+                        response = "Unable to add a new account, Reason: "
+                                + e.getMessage();
+                    } else {
+                        response = "Unable to log in, Reason: "
+                                + e.getMessage();
+                    }
                 } finally {
                     if (urlConnection != null)
                         urlConnection.disconnect();
@@ -117,27 +154,42 @@ public class SignInActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String s) {
-            if (s.startsWith("Unable to add the new course")) {
+            if (s.startsWith("Unable to add a new account")) {
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                return;
+            } else if(s.startsWith("Unable to log in")){
                 Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
                 JSONObject jsonObject = new JSONObject(s);
-                if (jsonObject.getBoolean("success")) {
-                    Toast.makeText(getApplicationContext(), "Account Added successfully"
-                            , Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(getApplicationContext(), "Account couldn't be added: "
-                                    + jsonObject.getString("error")
-                            , Toast.LENGTH_LONG).show();
-                    //Log.e(ADD_COURSE, jsonObject.getString("error"));
+                if(!mLoginMode){
+                    if (jsonObject.getBoolean("success")) {
+                        Toast.makeText(getApplicationContext(), "Account created successfully"
+                                , Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Account couldn't be created: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    // login
+                    if (jsonObject.getBoolean("success")) {
+                        Toast.makeText(getApplicationContext(), "Logged in successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        launchMain();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Couldn't log in: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    }
                 }
             } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "JSON Parsing error on Creating account"
+                Toast.makeText(getApplicationContext(), "JSON Parsing error: "
                                 + e.getMessage()
                         , Toast.LENGTH_LONG).show();
-               // Log.e(ADD_COURSE, e.getMessage());
             }
         }
     }

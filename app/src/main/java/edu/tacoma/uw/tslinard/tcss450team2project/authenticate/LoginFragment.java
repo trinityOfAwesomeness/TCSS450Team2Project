@@ -10,18 +10,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
 public class LoginFragment extends Fragment {
 
     private LoginFragmentListener mLoginFragmentListener;
+
     public LoginFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,13 +45,9 @@ public class LoginFragment extends Fragment {
                     Toast.makeText(v.getContext(), "Enter valid email address"
                             , Toast.LENGTH_SHORT).show();
                     emailText.requestFocus();
+                } else {
+                    mLoginFragmentListener.login(email, pwd);
                 }
-                else if(TextUtils.isEmpty(pwd) || pwd.length() < 6){
-                    Toast.makeText(v.getContext(), "Enter valid password (at least 6 characters)"
-                            ,Toast.LENGTH_SHORT).show();
-                    pwdText.requestFocus();
-                }
-                mLoginFragmentListener.login(email, pwd);
             }
         });
 
@@ -62,17 +56,14 @@ public class LoginFragment extends Fragment {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.sign_in_fragment_id, new CreateAccountFragment());
-                transaction.addToBackStack(null);
-                transaction.commit();
+                mLoginFragmentListener.launchCreateAccountFragment();
             }
         });
         return view;
     }
 
     public interface LoginFragmentListener {
-        public void login(String email, String pwd);
+        void login(String email, String pwd);
+        void launchCreateAccountFragment();
     }
 }
