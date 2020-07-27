@@ -1,7 +1,4 @@
-package main;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+package edu.tacoma.uw.tslinard.tcss450team2project.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +7,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import authenticate.SignInActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import edu.tacoma.uw.tslinard.tcss450team2project.authenticate.SignInActivity;
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
 public class MainMenuActivity extends AppCompatActivity {

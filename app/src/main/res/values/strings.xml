@@ -4,4 +4,10 @@
     <string name="LOGIN_PREFS">edu.tacoma.uw.PREFS</string>
     <string name="LOGGEDIN">loggedin</string>
     <string name="action_logout">Sign Out</string>
+
+    <string name="first_name_hint">First Name</string>
+    <string name="last_name_hint">Last Name</string>
+    <string name="user_name_hint">User Name</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
 </resources>
