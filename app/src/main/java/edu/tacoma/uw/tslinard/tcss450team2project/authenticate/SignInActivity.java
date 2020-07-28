@@ -38,7 +38,7 @@ public class SignInActivity extends AppCompatActivity
         setContentView(R.layout.activity_sign_in);
 
         mSharedPreferences = getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
-        if(!mSharedPreferences.getBoolean(getString(R.string.LOGGEDIN), false)) {
+        if (!mSharedPreferences.getBoolean(getString(R.string.LOGGEDIN), false)) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.sign_in_fragment_id, new LoginFragment())
                     .commit();
@@ -56,7 +56,7 @@ public class SignInActivity extends AppCompatActivity
         mLoginMode = true;
         StringBuilder url = new StringBuilder(getString(R.string.login));
         mLoginJSON = new JSONObject();
-        try{
+        try {
             mLoginJSON.put(Account.EMAIL, email);
             mLoginJSON.put(Account.PASSWORD, pwd);
             new SignInAsyncTask().execute(url.toString());
@@ -66,14 +66,15 @@ public class SignInActivity extends AppCompatActivity
         }
     }
 
-    private void launchMain(){
+    private void launchMain() {
         mSharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), true).commit();
         Intent intent = new Intent(this, MainMenuActivity.class);
-        try {
-            intent.putExtra(SIGNIN_MESSAGE, mLoginJSON.getString(Account.EMAIL));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        // Pass through data if necessary
+        //        try {
+        //            intent.putExtra(SIGNIN_MESSAGE, mLoginJSON.getString(Account.EMAIL));
+        //        } catch (JSONException e) {
+        //            e.printStackTrace();
+        //        }
         startActivity(intent);
         finish();
     }
@@ -92,16 +93,16 @@ public class SignInActivity extends AppCompatActivity
         StringBuilder url = new StringBuilder(getString(R.string.register));
 
         mCreateAccountJSON = new JSONObject();
-        try{
+        try {
             mCreateAccountJSON.put(Account.FIRST_NAME, account.getFirstName());
             mCreateAccountJSON.put(Account.LAST_NAME, account.getLastName());
             mCreateAccountJSON.put(Account.USER_NAME, account.getUserName());
             mCreateAccountJSON.put(Account.EMAIL, account.getEmail());
             mCreateAccountJSON.put(Account.PASSWORD, account.getPassword());
             new SignInAsyncTask().execute(url.toString());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             Toast.makeText(this, "Error with JSON creation on creating an account: "
-                            + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,7 +121,7 @@ public class SignInActivity extends AppCompatActivity
                     OutputStreamWriter wr =
                             new OutputStreamWriter(urlConnection.getOutputStream());
 
-                    if(!mLoginMode){
+                    if (!mLoginMode) {
                         wr.write(mCreateAccountJSON.toString());
                     } else {
                         wr.write(mLoginJSON.toString());
@@ -137,7 +138,7 @@ public class SignInActivity extends AppCompatActivity
                     }
 
                 } catch (Exception e) {
-                    if(!mLoginMode){
+                    if (!mLoginMode) {
                         response = "Unable to add a new account, Reason: "
                                 + e.getMessage();
                     } else {
@@ -157,30 +158,27 @@ public class SignInActivity extends AppCompatActivity
             if (s.startsWith("Unable to add a new account")) {
                 Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 return;
-            } else if(s.startsWith("Unable to log in")){
+            } else if (s.startsWith("Unable to log in")) {
                 Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
                 JSONObject jsonObject = new JSONObject(s);
-                if(!mLoginMode){
+                if (!mLoginMode) {
                     if (jsonObject.getBoolean("success")) {
                         Toast.makeText(getApplicationContext(), "Account created successfully"
                                 , Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(getApplicationContext(), "Account couldn't be created: "
                                         + jsonObject.getString("error")
                                 , Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    // login
                     if (jsonObject.getBoolean("success")) {
                         Toast.makeText(getApplicationContext(), "Logged in successfully"
                                 , Toast.LENGTH_SHORT).show();
                         launchMain();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(getApplicationContext(), "Couldn't log in: "
                                         + jsonObject.getString("error")
                                 , Toast.LENGTH_LONG).show();
