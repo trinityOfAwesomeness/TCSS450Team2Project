@@ -2,4 +2,6 @@
 <resources>
     <string name = "register">https://tslinard-calendarapp-backend.herokuapp.com/register</string>
     <string name = "login">https://tslinard-calendarapp-backend.herokuapp.com/login</string>
+    <string name = "add_event">https://tslinard-calendarapp-backend.herokuapp.com/addevent</string>
+    <string name = "get_events">https://tslinard-calendarapp-backend.herokuapp.com/events</string>
 </resources>
