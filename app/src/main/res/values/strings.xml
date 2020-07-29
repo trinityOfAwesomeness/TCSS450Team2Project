@@ -5,7 +5,9 @@
     <string name="LOGIN_PREFS">edu.tacoma.uw.PREFS</string>
     <string name="LOGGEDIN">loggedin</string>
 
-    <!-- menu strings -->
+    <!-- Navigation Drawer(menu) strings -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_logout">Sign Out</string>
 
     <!-- CreateAccountFragment strings -->

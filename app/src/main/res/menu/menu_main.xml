@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/action_logout"
-        android:orderInCategory="100"
-        android:title="@string/action_logout" />
+    <!-- Make sure that we can only select one menu item-->
+    <!-- It will stay selected-->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_weekly_schedule"
+            android:icon="@drawable/ic_weekly_schedule"
+            android:title="Weekly Schedule" />
+        <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/ic_calendar"
+            android:title="Calendar" />
+        <item
+            android:id="@+id/nav_to_do_list"
+            android:icon="@drawable/ic_to_do_list"
+            android:title="To Do List" />
+    </group>
 
+
+    <!-- It will trigger action but will not stay selected-->
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_send"
+                android:title="Send" />
+            <item
+                android:id="@+id/nav_signout"
+                android:icon="@drawable/ic_sign_out"
+                android:title="@string/action_logout" />
+
+        </menu>
+    </item>
 </menu>

@@ -17,7 +17,7 @@ public class CreateAccountFragment extends Fragment {
     private CreateAccountListener mCreateAccountListener;
 
     public interface CreateAccountListener {
-        public void createAccount(Account account);
+        void createAccount(Account account);
     }
 
     public CreateAccountFragment() {

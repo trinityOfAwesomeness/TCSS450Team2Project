@@ -20,7 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.MainMenuActivity;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.MainActivity;
 
 public class SignInActivity extends AppCompatActivity
         implements LoginFragment.LoginFragmentListener, CreateAccountFragment.CreateAccountListener {
@@ -40,10 +40,10 @@ public class SignInActivity extends AppCompatActivity
         mSharedPreferences = getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
         if (!mSharedPreferences.getBoolean(getString(R.string.LOGGEDIN), false)) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.sign_in_fragment_id, new LoginFragment())
+                    .add(R.id.sign_in_layout, new LoginFragment())
                     .commit();
         } else {
-            Intent intent = new Intent(this, MainMenuActivity.class);
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
         }
@@ -68,7 +68,7 @@ public class SignInActivity extends AppCompatActivity
 
     private void launchMain() {
         mSharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), true).commit();
-        Intent intent = new Intent(this, MainMenuActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         // Pass through data if necessary
         //        try {
         //            intent.putExtra(SIGNIN_MESSAGE, mLoginJSON.getString(Account.EMAIL));
@@ -83,7 +83,7 @@ public class SignInActivity extends AppCompatActivity
     public void launchCreateAccountFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.sign_in_fragment_id, new CreateAccountFragment())
+                .replace(R.id.sign_in_layout, new CreateAccountFragment())
                 .addToBackStack(null)
                 .commit();
     }

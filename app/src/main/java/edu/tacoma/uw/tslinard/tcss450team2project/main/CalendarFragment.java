@@ -1,20 +1,16 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,13 +20,14 @@ import java.util.List;
 import java.util.Locale;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.authenticate.SignInActivity;
 
-public class MainMenuActivity extends AppCompatActivity {
+
+public class CalendarFragment extends Fragment {
 
     ImageButton NextButton, PreviousButton;
     TextView CurrentDate;
     GridView gridView;
+    View view;
     private static final int MAX_CALENDAR_DAYS = 42;
     Calendar mainCalendar = Calendar.getInstance(Locale.ENGLISH);       // contains today's date
     GridAdapter myGridAdapter;
@@ -39,15 +36,24 @@ public class MainMenuActivity extends AppCompatActivity {
 
     SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu);
+    public CalendarFragment() {
+        // Required empty public constructor
+    }
 
-        NextButton = findViewById(R.id.nextBtn);
-        PreviousButton = findViewById(R.id.previousBtn);
-        CurrentDate = findViewById(R.id.current_Date);
-        gridView = findViewById(R.id.gridview);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view =  inflater.inflate(R.layout.fragment_calendar, container, false);
+        NextButton = view.findViewById(R.id.nextBtn);
+        PreviousButton = view.findViewById(R.id.previousBtn);
+        CurrentDate = view.findViewById(R.id.current_Date);
+        gridView = view.findViewById(R.id.gridview);
 
         SetUpCalendar();
 
@@ -70,27 +76,11 @@ public class MainMenuActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), "You clicked " + position , Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "You clicked " + position , Toast.LENGTH_SHORT).show();
             }
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item){
-        if(item.getItemId() == R.id.action_logout){
-            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
-            sharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), false).commit();
-            Intent intent = new Intent(this, SignInActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
+        return view;
     }
 
     private void SetUpCalendar() {
@@ -109,7 +99,7 @@ public class MainMenuActivity extends AppCompatActivity {
             pageCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        myGridAdapter = new GridAdapter(MainMenuActivity.this,pageDates,mainCalendar,eventsList);
+        myGridAdapter = new GridAdapter(view.getContext(),pageDates,mainCalendar,eventsList);
         gridView.setAdapter(myGridAdapter);
     }
 }
