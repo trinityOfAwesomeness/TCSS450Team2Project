@@ -14,6 +14,7 @@ public class WeeklyScheduleFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        getActivity().setTitle("Weekly Schedule");
         return inflater.inflate(R.layout.fragment_weekly_schedule, container, false);
     }
 }

@@ -16,10 +16,6 @@ public class CreateAccountFragment extends Fragment {
 
     private CreateAccountListener mCreateAccountListener;
 
-    public interface CreateAccountListener {
-        void createAccount(Account account);
-    }
-
     public CreateAccountFragment() {
         // Required empty public constructor
     }
@@ -57,6 +53,10 @@ public class CreateAccountFragment extends Fragment {
             }
         });
         return v;
+    }
+
+    public interface CreateAccountListener {
+        void createAccount(Account account);
     }
 
 }

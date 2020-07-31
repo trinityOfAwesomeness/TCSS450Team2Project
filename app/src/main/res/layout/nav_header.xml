@@ -18,7 +18,8 @@
         android:text="User Name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     <TextView
+        android:id="@+id/display_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="uwnetid@fake.email.com" />
+        android:text="email placeholder" />
 </LinearLayout>

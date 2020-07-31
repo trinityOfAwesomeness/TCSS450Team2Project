@@ -14,6 +14,7 @@ public class ToDoListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        getActivity().setTitle("To Do List");
         return inflater.inflate(R.layout.fragment_to_do_list, container, false);
     }
 }

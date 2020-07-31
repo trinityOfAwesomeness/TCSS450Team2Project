@@ -3,6 +3,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="white">@android:color/white</color>
-    <color name="huskyColor">#660DBF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="huskyColor">#371681</color>
+    <color name="huskySideColor">#E6D5A9</color>
 </resources>

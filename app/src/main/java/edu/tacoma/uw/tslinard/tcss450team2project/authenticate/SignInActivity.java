@@ -25,8 +25,6 @@ import edu.tacoma.uw.tslinard.tcss450team2project.main.MainActivity;
 public class SignInActivity extends AppCompatActivity
         implements LoginFragment.LoginFragmentListener, CreateAccountFragment.CreateAccountListener {
 
-    public static final String SIGNIN_MESSAGE = "SIGNIN_MESSAGE";
-
     private SharedPreferences mSharedPreferences;
     private JSONObject mCreateAccountJSON;
     private JSONObject mLoginJSON;
@@ -52,7 +50,6 @@ public class SignInActivity extends AppCompatActivity
 
     @Override
     public void login(String email, String pwd) {
-        //Toast.makeText(getApplicationContext(),email + ": " + pwd, Toast.LENGTH_SHORT).show();
         mLoginMode = true;
         StringBuilder url = new StringBuilder(getString(R.string.login));
         mLoginJSON = new JSONObject();
@@ -68,13 +65,12 @@ public class SignInActivity extends AppCompatActivity
 
     private void launchMain() {
         mSharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), true).commit();
+        try {
+            mSharedPreferences.edit().putString(getString(R.string.PASSEMAIL), mLoginJSON.getString(Account.EMAIL)).commit();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Intent intent = new Intent(this, MainActivity.class);
-        // Pass through data if necessary
-        //        try {
-        //            intent.putExtra(SIGNIN_MESSAGE, mLoginJSON.getString(Account.EMAIL));
-        //        } catch (JSONException e) {
-        //            e.printStackTrace();
-        //        }
         startActivity(intent);
         finish();
     }
@@ -154,16 +150,16 @@ public class SignInActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            if (s.startsWith("Unable to add a new account")) {
-                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+        protected void onPostExecute(String response) {
+            if (response.startsWith("Unable to add a new account")) {
+                Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                 return;
-            } else if (s.startsWith("Unable to log in")) {
-                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            } else if (response.startsWith("Unable to log in")) {
+                Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
-                JSONObject jsonObject = new JSONObject(s);
+                JSONObject jsonObject = new JSONObject(response);
                 if (!mLoginMode) {
                     if (jsonObject.getBoolean("success")) {
                         Toast.makeText(getApplicationContext(), "Account created successfully"

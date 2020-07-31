@@ -45,20 +45,4 @@ public class Account implements Serializable {
         return mPassword;
     }
 
-    // Use below method when parsing JSON is needed
-//    public static List<Account> parseCourseJson(String accountJson) throws JSONException {
-//        List<Account> accountList = new ArrayList<>();
-//        if(accountJson != null){
-//
-//            JSONArray arr = new JSONArray(accountJson);
-//
-//            for(int i = 0; i < arr.length(); i++) {
-//                JSONObject obj = arr.getJSONObject(i);
-//                Account account = new Account(obj.getString(Account.FIRST_NAME), obj.getString(Account.LAST_NAME)
-//                        , obj.getString(Account.EMAIL), obj.getString(Account.USER_NAME), obj.getString(Account.PASSWORD));
-//                accountList.add(account);
-//            }
-//        }
-//        return accountList;
-//    }
 }
