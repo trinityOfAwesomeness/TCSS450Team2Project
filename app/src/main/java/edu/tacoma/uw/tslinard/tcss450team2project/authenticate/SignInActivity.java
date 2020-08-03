@@ -22,19 +22,33 @@ import java.net.URL;
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.MainActivity;
 
+/**
+ * Class to initialize sign in activity.
+ * It implements login and sing up functionalities.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
+ */
 public class SignInActivity extends AppCompatActivity
-        implements LoginFragment.LoginFragmentListener, CreateAccountFragment.CreateAccountListener {
+        implements LoginFragment.LoginListener, SignUpFragment.SignUpListener {
 
     private SharedPreferences mSharedPreferences;
-    private JSONObject mCreateAccountJSON;
+    private JSONObject mSignUpJSON;
     private JSONObject mLoginJSON;
     private boolean mLoginMode;
 
+    /**
+     * Called when the activity is starting.
+     * It inflates the activity's UI using activity_sign_in.xml file.
+     *
+     * @param savedInstanceState - If the activity is being re-initialized after previously being shut down
+     *                           then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
+        // Checks if login has been done. If so, go to MainActivity class.
         mSharedPreferences = getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
         if (!mSharedPreferences.getBoolean(getString(R.string.LOGGEDIN), false)) {
             getSupportFragmentManager().beginTransaction()
@@ -47,15 +61,22 @@ public class SignInActivity extends AppCompatActivity
         }
     }
 
-
+    /**
+     * Overridden method from LoginFragment.LoginListener interface.
+     * It logs in with user's entered email and password through
+     * retrieving corresponding account from the web service.
+     *
+     * @param email    - user'e email
+     * @param password - user's password
+     */
     @Override
-    public void login(String email, String pwd) {
+    public void login(String email, String password) {
         mLoginMode = true;
         StringBuilder url = new StringBuilder(getString(R.string.login));
         mLoginJSON = new JSONObject();
         try {
             mLoginJSON.put(Account.EMAIL, email);
-            mLoginJSON.put(Account.PASSWORD, pwd);
+            mLoginJSON.put(Account.PASSWORD, password);
             new SignInAsyncTask().execute(url.toString());
         } catch (JSONException e) {
             Toast.makeText(this, "Error with JSON creation on creating an account: "
@@ -63,10 +84,53 @@ public class SignInActivity extends AppCompatActivity
         }
     }
 
-    private void launchMain() {
-        mSharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), true).commit();
+    /**
+     * Overridden method from LoginFragment.LoginListener interface.
+     * It launches signUpFragment.
+     */
+    @Override
+    public void launchSignUpFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.sign_in_layout, new SignUpFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+    /**
+     * Overridden method from SignUpFragment.SignUpListener interface.
+     * It signs up an input account through
+     * posting the account to the web service.
+     *
+     * @param account - The account to be signed up.
+     */
+    @Override
+    public void singUp(Account account) {
+        mLoginMode = false;
+        StringBuilder url = new StringBuilder(getString(R.string.register));
+        mSignUpJSON = new JSONObject();
         try {
-            mSharedPreferences.edit().putString(getString(R.string.PASSEMAIL), mLoginJSON.getString(Account.EMAIL)).commit();
+            mSignUpJSON.put(Account.FIRST_NAME, account.getFirstName());
+            mSignUpJSON.put(Account.LAST_NAME, account.getLastName());
+            mSignUpJSON.put(Account.USER_NAME, account.getUserName());
+            mSignUpJSON.put(Account.EMAIL, account.getEmail());
+            mSignUpJSON.put(Account.PASSWORD, account.getPassword());
+            new SignInAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on creating an account: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Launch MainActivity class with data stored in mSharedPreferences.
+     */
+    private void launchMain() {
+        try {
+            mSharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), true)
+                    .putString(getString(R.string.PASSEMAIL), mLoginJSON.getString(Account.EMAIL))
+                    .commit();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -75,33 +139,10 @@ public class SignInActivity extends AppCompatActivity
         finish();
     }
 
-    @Override
-    public void launchCreateAccountFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.sign_in_layout, new CreateAccountFragment())
-                .addToBackStack(null)
-                .commit();
-    }
-
-    @Override
-    public void createAccount(Account account) {
-        StringBuilder url = new StringBuilder(getString(R.string.register));
-
-        mCreateAccountJSON = new JSONObject();
-        try {
-            mCreateAccountJSON.put(Account.FIRST_NAME, account.getFirstName());
-            mCreateAccountJSON.put(Account.LAST_NAME, account.getLastName());
-            mCreateAccountJSON.put(Account.USER_NAME, account.getUserName());
-            mCreateAccountJSON.put(Account.EMAIL, account.getEmail());
-            mCreateAccountJSON.put(Account.PASSWORD, account.getPassword());
-            new SignInAsyncTask().execute(url.toString());
-        } catch (JSONException e) {
-            Toast.makeText(this, "Error with JSON creation on creating an account: "
-                    + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
+    /**
+     * Inner class which can connect to the backend database and GET/POST data to the corresponding web service.
+     * It tries to login if mLoginMode is set to true. Otherwise, it tries to sign up an account.
+     */
     private class SignInAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -118,7 +159,7 @@ public class SignInActivity extends AppCompatActivity
                             new OutputStreamWriter(urlConnection.getOutputStream());
 
                     if (!mLoginMode) {
-                        wr.write(mCreateAccountJSON.toString());
+                        wr.write(mSignUpJSON.toString());
                     } else {
                         wr.write(mLoginJSON.toString());
                     }
@@ -151,10 +192,7 @@ public class SignInActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String response) {
-            if (response.startsWith("Unable to add a new account")) {
-                Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
-                return;
-            } else if (response.startsWith("Unable to log in")) {
+            if (response.startsWith("Unable to add a new account") || response.startsWith("Unable to log in")) {
                 Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -164,6 +202,7 @@ public class SignInActivity extends AppCompatActivity
                     if (jsonObject.getBoolean("success")) {
                         Toast.makeText(getApplicationContext(), "Account created successfully"
                                 , Toast.LENGTH_SHORT).show();
+                        getSupportFragmentManager().popBackStackImmediate();
                     } else {
                         Toast.makeText(getApplicationContext(), "Account couldn't be created: "
                                         + jsonObject.getString("error")

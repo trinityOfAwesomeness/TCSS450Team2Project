@@ -7,16 +7,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-// calendar event class
+/**
+ * Events class for calendar and weekly schedule.
+ */
 public class Events {
 
-    private String mStartDate;
-    private String mStartTime;
-    private String mEndDate;
-    private String mEndTime;
-    private String mEventName;
-    private String mNote;
-
+    // Properties of Json object. Used to GET/POST events.
     public static final String START_DATE = "startdate";
     public static final String START_TIME = "starttime";
     public static final String END_DATE = "enddate";
@@ -24,6 +20,14 @@ public class Events {
     public static final String EVENT_NAME = "eventname";
     public static final String NOTE = "note";
     public static final String EMAIL = "email";
+
+
+    private String mStartDate;
+    private String mStartTime;
+    private String mEndDate;
+    private String mEndTime;
+    private String mEventName;
+    private String mNote;
 
     public Events(String startDate, String startTime, String endDate, String endTime, String eventName, String note){
         mStartDate = startDate;
@@ -58,12 +62,16 @@ public class Events {
         return mNote;
     }
 
+    /**
+     * Parse Json format and retrieve list of events.
+     * @param eventsJson - string in Json format
+     * @return - list of events retrieved from Json format
+     * @throws JSONException - if input string is not in Json format
+     */
     public static List<Events> parseEventsJson(String eventsJson) throws JSONException {
         List<Events> eventsList = new ArrayList<>();
         if(eventsJson != null){
-
             JSONArray arr = new JSONArray(eventsJson);
-
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 Events event = new Events(obj.getString(Events.START_DATE), obj.getString(Events.START_TIME),
@@ -73,9 +81,5 @@ public class Events {
             }
         }
         return eventsList;
-    }
-
-    public String toString(){
-        return mStartDate;
     }
 }

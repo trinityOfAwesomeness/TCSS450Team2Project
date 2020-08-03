@@ -1,4 +1,4 @@
-package edu.tacoma.uw.tslinard.tcss450team2project.main;
+package edu.tacoma.uw.tslinard.tcss450team2project.main.calendar;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -20,7 +20,12 @@ import java.util.List;
 import java.util.Locale;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
 
+/**
+ * Class to display single cell of the calendar.
+ * It is an adapter class which connects the data and the view.
+ */
 public class GridAdapter extends ArrayAdapter {
 
     private List<Date> mPageDates;
@@ -29,23 +34,25 @@ public class GridAdapter extends ArrayAdapter {
     private LayoutInflater mInflater;
 
     public GridAdapter(@NonNull Context context, List<Date> pageDates, Calendar currentDate, List<Events> events) {
-        super(context, R.layout.single_cell_day_layout);
-
+        super(context, R.layout.layout_single_cell_day);
         this.mPageDates = pageDates;
         this.mCurrentDate = currentDate;
         this.mEventsList = events;
-
-        //layout을 뷰로 만들어주는 것
         mInflater = LayoutInflater.from(context);
-
     }
 
-    //getView는 아이템하나의 view를 만들어주는 메소드다.
-    // convertView가 아이템하나의 view이다
+    /**
+     * Get a View that displays the day of month at the specified position in the Calendar.
+     *
+     * @param position    - the position of the grid cell
+     * @param convertView - view that inflate single cell layout
+     * @param parent      - parent view that apply default layout parameters
+     * @return - view of the single cell
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
+        // the first row displays the day of week
         if (position < 7) {
             String dayOfWeek = "";
             switch (position) {
@@ -71,13 +78,17 @@ public class GridAdapter extends ArrayAdapter {
                     dayOfWeek = "Sat";
                     break;
             }
+
+            // Inflates view with layout if it is created for the first time. (Similar to recyclerview)
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.single_cell_dayofweek_layout, parent, false);
+                convertView = mInflater.inflate(R.layout.layout_single_cell_dayofweek, parent, false);
                 convertView.setBackgroundColor(getContext().getResources().getColor(R.color.white));
-                TextView tv_dayOfWeek = convertView.findViewById(R.id.calendar_dayOfWeek);
-                tv_dayOfWeek.setText(dayOfWeek);
+                TextView dayOfWeekTextView = convertView.findViewById(R.id.tv_calendar_dayofweek);
+                dayOfWeekTextView.setText(dayOfWeek);
             }
-        } else {
+        }
+        // the rest of the rows display days of month
+        else {
             Date pageDate = mPageDates.get(position - 7);
             Calendar pageCalendar = Calendar.getInstance();
             pageCalendar.setTime(pageDate);
@@ -87,44 +98,51 @@ public class GridAdapter extends ArrayAdapter {
             int currentMonth = mCurrentDate.get(Calendar.MONTH) + 1;
             int currentYear = mCurrentDate.get(Calendar.YEAR);
 
-            // inflater과정을 거쳐야지 화면상의 UI가 만들어진다.
-            // layout을가지고 view를 inflate해주는것
-            // 한번도 만들어지지않은 item view를 만든다. (만약 화면에 안보여지면 사라지고 추후 재활용을 한다.)
+            // Inflates view with layout if it is created for the first time. (Similar to recyclerview)
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.single_cell_day_layout, parent, false);
+                convertView = mInflater.inflate(R.layout.layout_single_cell_day, parent, false);
             }
 
 
-            TextView tv_calendarDay = convertView.findViewById(R.id.calendar_day);
-            TextView tv_numberOfEvents = convertView.findViewById(R.id.number_of_events);
+            TextView calendarDayTextView = convertView.findViewById(R.id.tv_calendar_day);
+            TextView numberOfEventsTextView = convertView.findViewById(R.id.tv_number_of_events);
+            // Set the background color of a cell to white
             convertView.setBackgroundColor(getContext().getResources().getColor(R.color.white));
+            // Deepen color of the day's text view if the day is in the current month
             if (displayMonth == currentMonth && displayYear == currentYear) {
-                tv_calendarDay.setTextColor(Color.parseColor("#FF000000"));
-                tv_numberOfEvents.setTextColor(Color.parseColor("#BE000000"));
+                calendarDayTextView.setTextColor(Color.parseColor("#FF000000"));
+                numberOfEventsTextView.setTextColor(Color.parseColor("#BE000000"));
             } else {
-                tv_calendarDay.setTextColor(Color.parseColor("#FFDAD8D8"));
-                tv_numberOfEvents.setTextColor(Color.parseColor("#FFDAD8D8"));
+                calendarDayTextView.setTextColor(Color.parseColor("#FFDAD8D8"));
+                numberOfEventsTextView.setTextColor(Color.parseColor("#FFDAD8D8"));
             }
 
-            tv_calendarDay.setText(String.valueOf(displayDay));
+            // display day in the calendar
+            calendarDayTextView.setText(String.valueOf(displayDay));
 
+            // display number of events of the day in the calendar
             Calendar eventCalendar = Calendar.getInstance();
-            TextView EventNumber = convertView.findViewById(R.id.number_of_events);
             ArrayList<Events> currentDateEvents = new ArrayList<>();
             for (int i = 0; i < mEventsList.size(); i++) {
-                Date date = ConvertStringToDate(mEventsList.get(i).getStartDate());
+                Date date = convertStringToDate(mEventsList.get(i).getStartDate());
                 eventCalendar.setTime(date);
                 if (displayDay == eventCalendar.get(Calendar.DAY_OF_MONTH) && displayMonth == eventCalendar.get(Calendar.MONTH) + 1
                         && displayYear == eventCalendar.get(Calendar.YEAR)) {
                     currentDateEvents.add(mEventsList.get(i));
-                    EventNumber.setText(currentDateEvents.size() + " Events");
+                    numberOfEventsTextView.setText(currentDateEvents.size() + " Events");
                 }
             }
         }
         return convertView;
     }
 
-    private Date ConvertStringToDate(String eventDate) {
+    /**
+     * Covert string representation of a date into Date object.
+     *
+     * @param eventDate - string representation of a date
+     * @return - Date object
+     */
+    private Date convertStringToDate(String eventDate) {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
         Date date = null;
         try {
@@ -136,22 +154,35 @@ public class GridAdapter extends ArrayAdapter {
         return date;
     }
 
-    // 화면상에 뿌려질 data갯수
+    /**
+     * Get number of items in the grid view.
+     *
+     * @return - number of items in the grid view
+     */
     @Override
     public int getCount() {
         return mPageDates.size() + 7; //42
     }
 
 
-    // 무엇을하는가?
+    /**
+     * Get position of the item
+     *
+     * @param item - the item
+     * @return - the position of the item
+     */
     @Override
     public int getPosition(@Nullable Object item) {
         return mPageDates.indexOf(item);
     }
 
 
-    // 아이템이 무엇을 반환할것인가.
-    // 무엇을하는가?
+    /**
+     * Get item according to position
+     *
+     * @param position - the index of an item
+     * @return - the item
+     */
     @Nullable
     @Override
     public Object getItem(int position) {

@@ -1,42 +1,40 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.authenticate;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
 /**
- * Class to create and control the Login page.
+ * Class to create and control the Sign Up page.
  *
  * @author Seoungdeok Jeon
  * @author Tatiana Linardopoulou
  */
-public class LoginFragment extends Fragment {
+public class SignUpFragment extends Fragment {
 
-    private LoginListener mLoginListener;
+    private SignUpListener mSignUpListener;
 
     /**
-     * Called to do initial creation of LoginFragment.
+     * Called to do initial creation of SignUpFragment.
      *
      * @param savedInstanceState - If the fragment is being re-created from a previous saved state, this is the state.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLoginListener = (LoginListener) getActivity();
+        mSignUpListener = (SignUpListener) getActivity();
     }
 
     /**
      * Called to have the fragment instantiate its user interface view
-     * with fragment_login.xml file.
+     * with fragment_sign_up.xml file.
      *
      * @param inflater           - The LayoutInflater object that can be used to inflate views in the fragment.
      * @param container          - If non-null, this is the parent view that the fragment's UI should be attached to.
@@ -47,52 +45,43 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
-        getActivity().setTitle("Sign In");
+        View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
+        getActivity().setTitle("Create Account");
+        final EditText firstNameEditText = view.findViewById(R.id.et_first_name);
+        final EditText lastNameEditText = view.findViewById(R.id.et_last_name);
+        final EditText uerNameEditText = view.findViewById(R.id.et_user_name);
         final EditText emailEditText = view.findViewById(R.id.et_email);
         final EditText passwordEditText = view.findViewById(R.id.et_password);
-        Button loginButton = view.findViewById(R.id.btn_login);
-        // Login if loginButton is clicked
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        Button signUpButton = view.findViewById(R.id.btn_sign_up);
+        // Sign up an account with user's input data
+        signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String firstName = firstNameEditText.getText().toString();
+                String lastName = lastNameEditText.getText().toString();
+                String userName = uerNameEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                if (TextUtils.isEmpty(email) || !email.contains("@")) {
-                    Toast.makeText(v.getContext(), "Enter valid email address", Toast.LENGTH_SHORT).show();
-                    emailEditText.requestFocus();
-                } else {
-                    mLoginListener.login(email, password);
+                Account account = new Account(firstName, lastName, userName, email, password);
+                if (mSignUpListener != null) {
+                    mSignUpListener.singUp(account);
                 }
-            }
-        });
-        // Launch SignUpFragment if createAccountButton is clicked
-        Button createAccountButton = view.findViewById(R.id.btn_create_account);
-        createAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLoginListener.launchSignUpFragment();
             }
         });
         return view;
     }
 
     /**
-     * Interface for logging in.
+     * Interface for signing up.
      */
-    public interface LoginListener {
+    public interface SignUpListener {
         /**
-         * Login with user's entered email and password through
-         * retrieving corresponding account from the web service.
+         * Sign up an input account through
+         * posting the account to the web service.
          *
-         * @param email    - user'e email
-         * @param password - user's password
+         * @param account - account to be signed up.
          */
-        void login(String email, String password);
-
-        /**
-         * Launch signUpFragment.
-         */
-        void launchSignUpFragment();
+        void singUp(Account account);
     }
+
 }

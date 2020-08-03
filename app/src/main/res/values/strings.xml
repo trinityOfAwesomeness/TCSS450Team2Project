@@ -11,7 +11,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_logout">Sign Out</string>
 
-    <!-- CreateAccountFragment strings -->
+    <!-- SignUpFragment strings -->
     <string name="title">CREATE ACCOUNT</string>
     <string name="first_name_hint">First Name</string>
     <string name="last_name_hint">Last Name</string>
