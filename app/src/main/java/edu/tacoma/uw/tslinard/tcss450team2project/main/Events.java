@@ -17,6 +17,7 @@ import java.util.Locale;
 public class Events {
 
     // Properties of Json object. Used to GET/POST events.
+    public static final String EVENT_ID = "eventid";
     public static final String START_DATE = "startdate";
     public static final String START_TIME = "starttime";
     public static final String END_DATE = "enddate";
@@ -25,7 +26,7 @@ public class Events {
     public static final String NOTE = "note";
     public static final String EMAIL = "email";
 
-
+    private String mEventId;
     private String mStartDate;
     private String mStartTime;
     private String mEndDate;
@@ -33,13 +34,18 @@ public class Events {
     private String mEventName;
     private String mNote;
 
-    public Events(String startDate, String startTime, String endDate, String endTime, String eventName, String note){
+    public Events(String eventId, String startDate, String startTime, String endDate, String endTime, String eventName, String note){
+        mEventId = eventId;
         mStartDate = startDate;
         mStartTime = startTime;
         mEndDate = endDate;
         mEndTime = endTime;
         mEventName = eventName;
         mNote = note;
+    }
+
+    public String getEventId() {
+        return mEventId;
     }
 
     public String getStartDate() {
@@ -78,7 +84,8 @@ public class Events {
             JSONArray arr = new JSONArray(eventsJson);
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
-                Events event = new Events(obj.getString(Events.START_DATE), obj.getString(Events.START_TIME),
+                Events event = new Events(obj.getString(Events.EVENT_ID),
+                        obj.getString(Events.START_DATE), obj.getString(Events.START_TIME),
                         obj.getString(Events.END_DATE), obj.getString(Events.END_TIME),
                         obj.getString(Events.EVENT_NAME), obj.getString(Events.NOTE));
                 eventsList.add(event);

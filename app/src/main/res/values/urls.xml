@@ -4,4 +4,5 @@
     <string name = "login">https://tslinard-calendarapp-backend.herokuapp.com/login</string>
     <string name = "add_event">https://tslinard-calendarapp-backend.herokuapp.com/addevent</string>
     <string name = "get_events">https://tslinard-calendarapp-backend.herokuapp.com/events</string>
+    <string name = "edit_event">https://tslinard-calendarapp-backend.herokuapp.com/editevent</string>
 </resources>

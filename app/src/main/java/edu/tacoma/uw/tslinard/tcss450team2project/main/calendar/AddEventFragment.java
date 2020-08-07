@@ -144,7 +144,7 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
             String endTime = mEndTimeEditText.getText().toString();
             String eventName = mEventNameEditText.getText().toString();
             String note = mNoteEditText.getText().toString();
-            Events event = new Events(startDate, startTime, endDate, endTime, eventName, note);
+            Events event = new Events(null, startDate, startTime, endDate, endTime, eventName, note);
             if (mAddEventListener != null) {
                 mAddEventListener.addEvent(event);
             }

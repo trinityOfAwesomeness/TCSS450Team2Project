@@ -171,6 +171,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void editEvent(Events event) {
+        mAddEventMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.edit_event));
+        mAddEventJSON = new JSONObject();
+        try {
+            mAddEventJSON.put(Events.EVENT_ID, event.getEventId());
+            mAddEventJSON.put(Events.START_DATE, event.getStartDate());
+            mAddEventJSON.put(Events.START_TIME, event.getStartTime());
+            mAddEventJSON.put(Events.END_DATE, event.getEndDate());
+            mAddEventJSON.put(Events.END_TIME, event.getEndTime());
+            mAddEventJSON.put(Events.EVENT_NAME, event.getEventName());
+            mAddEventJSON.put(Events.NOTE, event.getNote());
+            mAddEventJSON.put(Events.EMAIL, mEmail);
+
+            new EventsAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error editing event: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     /**
      * Overridden method from CalendarFragment.GetEventsListener interface.
      * Retrieve events from the web service.
@@ -184,7 +205,7 @@ public class MainActivity extends AppCompatActivity
             mGetEventsJSON.put(Events.EMAIL, mEmail);
             new EventsAsyncTask().execute(url.toString());
         } catch (JSONException e) {
-            Toast.makeText(this, "Error with JSON creation on getting events: "
+            Toast.makeText(this, "Error in getting events: "
                     + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
