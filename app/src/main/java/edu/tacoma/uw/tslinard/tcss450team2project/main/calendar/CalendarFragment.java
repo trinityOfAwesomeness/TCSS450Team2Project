@@ -131,7 +131,7 @@ public class CalendarFragment extends Fragment {
     private void openEventDialog(View view, Date selectedDate){
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.layout_dialog_events, null);
+        View dialogView = inflater.inflate(R.layout.dialog_events, null);
 
         // set recycler view
         RecyclerView recyclerView = dialogView.findViewById(R.id.events_recycle_view);
@@ -162,8 +162,6 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
-        //hide a menu item
-        menu.findItem(R.id.add_event_item).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

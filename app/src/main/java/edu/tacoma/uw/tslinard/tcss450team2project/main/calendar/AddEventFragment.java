@@ -4,11 +4,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -32,6 +30,7 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
 
     private EditText mStartDateEditText, mStartTimeEditText, mEndDateEditText, mEndTimeEditText,
             mEventNameEditText, mNoteEditText;
+    private Button mSaveEventButton;
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Calendar mCalendar;
 
@@ -44,7 +43,6 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAddEventListener = (AddEventListener) getActivity();
-        setHasOptionsMenu(true);
     }
 
     /**
@@ -68,6 +66,7 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
         mEndTimeEditText = view.findViewById(R.id.et_end_time);
         mEventNameEditText = view.findViewById(R.id.et_event_name);
         mNoteEditText = view.findViewById(R.id.et_note);
+        mSaveEventButton = view.findViewById(R.id.btn_save_event);
 
         // get today's date
         mCalendar = Calendar.getInstance();
@@ -86,47 +85,8 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
         mStartTimeEditText.setOnClickListener(this);
         mEndDateEditText.setOnClickListener(this);
         mEndTimeEditText.setOnClickListener(this);
-
+        mSaveEventButton.setOnClickListener(this);
         return view;
-    }
-
-    /**
-     * Create the options menu when the user opens the menu for the first time.
-     *
-     * @param menu     - menu container
-     * @param inflater - The MenuInflater object that can be used to inflate views in the menu.
-     */
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
-        //hide a menu item
-        menu.findItem(R.id.create_event_item).setVisible(false);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    /**
-     * When the user selects an item from the options menu, the system calls this method.
-     *
-     * @param item - the MenuItem selected.
-     * @return - the boolean for checking if an item is selected or not
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        // Add an event when add_event_item is selected
-        if (id == R.id.add_event_item) {
-            String startDate = mStartDateEditText.getText().toString();
-            String startTime = mStartTimeEditText.getText().toString();
-            String endDate = mEndDateEditText.getText().toString();
-            String endTime = mEndTimeEditText.getText().toString();
-            String eventName = mEventNameEditText.getText().toString();
-            String note = mNoteEditText.getText().toString();
-            Events event = new Events(startDate, startTime, endDate, endTime, eventName, note);
-            if (mAddEventListener != null) {
-                mAddEventListener.addEvent(event);
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -176,6 +136,18 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
                         }
                     }, mHour, mMinute, false);
             timePickerDialog.show();
+        }
+        if (view == mSaveEventButton) {
+            String startDate = mStartDateEditText.getText().toString();
+            String startTime = mStartTimeEditText.getText().toString();
+            String endDate = mEndDateEditText.getText().toString();
+            String endTime = mEndTimeEditText.getText().toString();
+            String eventName = mEventNameEditText.getText().toString();
+            String note = mNoteEditText.getText().toString();
+            Events event = new Events(startDate, startTime, endDate, endTime, eventName, note);
+            if (mAddEventListener != null) {
+                mAddEventListener.addEvent(event);
+            }
         }
     }
 

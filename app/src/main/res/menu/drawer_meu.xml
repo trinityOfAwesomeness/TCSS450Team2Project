@@ -20,16 +20,8 @@
 
 
     <!-- It will trigger action but will not stay selected-->
-    <item android:title="Communicate">
+    <item android:title="Action">
         <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_send"
-                android:title="Send" />
             <item
                 android:id="@+id/nav_signout"
                 android:icon="@drawable/ic_sign_out"

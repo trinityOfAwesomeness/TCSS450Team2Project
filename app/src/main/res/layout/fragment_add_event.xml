@@ -14,7 +14,7 @@
             android:id="@+id/start_date"
             android:layout_width="300dp"
             android:layout_height="60dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,16 +36,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:textColor="@android:color/black"
                 android:background="@color/uwWhite"
-                android:text=" Start Date " />
+                android:text=" Start Date "
+                android:textColor="@android:color/black" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/start_time"
             android:layout_width="300dp"
             android:layout_height="60dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,25 +58,25 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/border"
                 android:editable="false"
+                android:gravity="center"
                 android:inputType="none"
-                android:paddingLeft="5dp"
-                android:gravity="center"/>
+                android:paddingLeft="5dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:textColor="@android:color/black"
                 android:background="@color/uwWhite"
-                android:text=" Start Time " />
+                android:text=" Start Time "
+                android:textColor="@android:color/black" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/end_date"
             android:layout_width="300dp"
             android:layout_height="60dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
@@ -89,25 +89,25 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/border"
                 android:editable="false"
+                android:gravity="center"
                 android:inputType="none"
-                android:paddingLeft="5dp"
-                android:gravity="center"/>
+                android:paddingLeft="5dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:textColor="@android:color/black"
                 android:background="@color/uwWhite"
-                android:text=" End Date " />
+                android:text=" End Date "
+                android:textColor="@android:color/black" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/end_time"
             android:layout_width="300dp"
             android:layout_height="60dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
@@ -120,25 +120,25 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/border"
                 android:editable="false"
+                android:gravity="center"
                 android:inputType="none"
-                android:paddingLeft="5dp"
-                android:gravity="center"/>
+                android:paddingLeft="5dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:textColor="@android:color/black"
                 android:background="@color/uwWhite"
-                android:text=" End Time " />
+                android:text=" End Time "
+                android:textColor="@android:color/black" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/event_name"
             android:layout_width="300dp"
             android:layout_height="60dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
@@ -150,30 +150,28 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/border"
-                android:paddingLeft="5dp"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:paddingLeft="5dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:textColor="@android:color/black"
                 android:background="@color/uwWhite"
-                android:text=" Event Name " />
+                android:text=" Event Name "
+                android:textColor="@android:color/black" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/note"
             android:layout_width="300dp"
             android:layout_height="60dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/event_name"
-            app:layout_constraintVertical_bias="0.11">
+            app:layout_constraintTop_toBottomOf="@+id/event_name">
 
             <EditText
                 android:id="@+id/et_note"
@@ -189,10 +187,24 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:textColor="@android:color/black"
                 android:background="@color/uwWhite"
-                android:text=" Note (optional) " />
+                android:text=" Note (optional) "
+                android:textColor="@android:color/black" />
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_save_event"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="SAVE EVENT"
+            android:background="@drawable/button"
+            android:textColor="@color/uwWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/note"
+            app:layout_constraintVertical_bias="0.266" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

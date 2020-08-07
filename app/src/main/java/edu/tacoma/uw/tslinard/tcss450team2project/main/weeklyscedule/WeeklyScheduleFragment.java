@@ -1,17 +1,15 @@
-package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyScedule;
+package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,7 +25,7 @@ import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
  * @author Seoungdeok Jeon
  * @author Tatiana Linardopoulou
  */
-public class WeeklyScheduleFragmentAM extends Fragment {
+public class WeeklyScheduleFragment extends Fragment {
     private View mView;
     private GridView mGridView;
     private List<Events> mEventsList;
@@ -35,7 +33,7 @@ public class WeeklyScheduleFragmentAM extends Fragment {
     private WeeklyScheduleGridAdapter mWeeklyScheduleGridAdapter;
 
     /**
-     * Called to do initial creation of WeeklyScheduleFragmentAM.
+     * Called to do initial creation of WeeklyScheduleFragment.
      *
      * @param savedInstanceState - If the fragment is being re-created from a previous saved state, this is the state.
      */
@@ -49,7 +47,7 @@ public class WeeklyScheduleFragmentAM extends Fragment {
 
     /**
      * Called to have the fragment instantiate its user interface view
-     * with fragment_weekly_schedule_am.xml file.
+     * with fragment_weekly_schedule.xml file.
      *
      * @param inflater - The LayoutInflater object that can be used to inflate views in the fragment.
      * @param container - If non-null, this is the parent view that the fragment's UI should be attached to.
@@ -59,8 +57,8 @@ public class WeeklyScheduleFragmentAM extends Fragment {
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_weekly_schedule_am, container, false);
-        getActivity().setTitle("Weekly Schedule (AM)");
+        mView = inflater.inflate(R.layout.fragment_weekly_schedule, container, false);
+        getActivity().setTitle("Weekly Schedule");
         mGridView = mView.findViewById(R.id.weekly_schedule_grid_view_am);
 
         updateWeeklySchedule();
@@ -68,23 +66,9 @@ public class WeeklyScheduleFragmentAM extends Fragment {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                position -= 7;
                 Toast.makeText(getActivity(), "Position: " + position
                         , Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        Button showPMFragmentButton = (Button) mView.findViewById(R.id.btn_slide_down);
-        showPMFragmentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(),"PM!",Toast.LENGTH_SHORT).show();
-                WeeklyScheduleFragmentPM weeklyScheduleFragmentPM = new WeeklyScheduleFragmentPM();
-                weeklyScheduleFragmentPM.setEventsList(extractEventsInCurrentWeek(mEventsList));
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, weeklyScheduleFragmentPM);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
             }
         });
 
@@ -92,6 +76,8 @@ public class WeeklyScheduleFragmentAM extends Fragment {
     }
 
     private void updateWeeklySchedule() {
+//        Toast.makeText(getActivity(), extractEventsInCurrentWeek(mEventsList).toString() + "KK"
+//                , Toast.LENGTH_SHORT).show();
         mWeeklyScheduleGridAdapter = new WeeklyScheduleGridAdapter(mView.getContext(), mCurrentWeekDateList,
                 extractEventsInCurrentWeek(mEventsList));
         mGridView.setAdapter(mWeeklyScheduleGridAdapter);
@@ -113,8 +99,6 @@ public class WeeklyScheduleFragmentAM extends Fragment {
                 }
             }
         }
-        Toast.makeText(getActivity(), eventsInCurrentWeek.toString() + "*"
-                            , Toast.LENGTH_SHORT).show();
         return eventsInCurrentWeek;
     }
 

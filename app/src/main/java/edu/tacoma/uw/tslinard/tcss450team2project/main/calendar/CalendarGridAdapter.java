@@ -11,13 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
@@ -34,7 +31,7 @@ public class CalendarGridAdapter extends ArrayAdapter {
     private LayoutInflater mInflater;
 
     public CalendarGridAdapter(@NonNull Context context, List<Date> pageDates, Calendar currentDate, List<Events> events) {
-        super(context, R.layout.layout_single_cell_calendar);
+        super(context, R.layout.single_cell_calendar);
         mPageDates = pageDates;
         mCurrentDate = currentDate;
         mEventsList = events;
@@ -81,7 +78,7 @@ public class CalendarGridAdapter extends ArrayAdapter {
 
             // Inflates view with layout if it is created for the first time. (Similar to recyclerview)
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.layout_single_cell_calendar_dayofweek, parent, false);
+                convertView = mInflater.inflate(R.layout.single_cell_calendar_dayofweek, parent, false);
                 convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwWhite));
                 TextView dayOfWeekTextView = convertView.findViewById(R.id.tv_calendar_dayofweek);
                 dayOfWeekTextView.setText(dayOfWeek);
@@ -100,7 +97,7 @@ public class CalendarGridAdapter extends ArrayAdapter {
 
             // Inflates view with layout if it is created for the first time. (Similar to recyclerview)
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.layout_single_cell_calendar, parent, false);
+                convertView = mInflater.inflate(R.layout.single_cell_calendar, parent, false);
             }
 
 
@@ -124,7 +121,7 @@ public class CalendarGridAdapter extends ArrayAdapter {
             Calendar eventCalendar = Calendar.getInstance();
             ArrayList<Events> currentDateEvents = new ArrayList<>();
             for (int i = 0; i < mEventsList.size(); i++) {
-                Date date = convertStringToDate(mEventsList.get(i).getEndDate());
+                Date date = Events.convertStringToDate(mEventsList.get(i).getEndDate());
                 eventCalendar.setTime(date);
                 if (displayDay == eventCalendar.get(Calendar.DAY_OF_MONTH) && displayMonth == eventCalendar.get(Calendar.MONTH) + 1
                         && displayYear == eventCalendar.get(Calendar.YEAR)) {
@@ -134,24 +131,6 @@ public class CalendarGridAdapter extends ArrayAdapter {
             }
         }
         return convertView;
-    }
-
-    /**
-     * Covert string representation of a date into Date object.
-     *
-     * @param eventDate - string representation of a date
-     * @return - Date object
-     */
-    private Date convertStringToDate(String eventDate) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
-        Date date = null;
-        try {
-            date = format.parse(eventDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return date;
     }
 
     /**

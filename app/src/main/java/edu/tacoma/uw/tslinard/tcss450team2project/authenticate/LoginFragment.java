@@ -48,7 +48,7 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-        getActivity().setTitle("Sign In");
+        getActivity().setTitle("HuskyCal");
         final EditText emailEditText = view.findViewById(R.id.et_email);
         final EditText passwordEditText = view.findViewById(R.id.et_password);
         Button loginButton = view.findViewById(R.id.btn_login);

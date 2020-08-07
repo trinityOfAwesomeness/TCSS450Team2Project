@@ -4,19 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/weekly_schedule_layout_am"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
         <LinearLayout
+            android:id="@+id/weekly_schedule_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="10">
 
@@ -30,14 +26,13 @@
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="38dp"
                     android:gravity="right"
                     android:text="0 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="1 " />
 
@@ -51,111 +46,141 @@
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="3 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="4 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="5 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="6 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="7 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="8 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="9 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="10 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="11 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
                     android:text="12 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
-                    android:text="12 " />
+                    android:text="13 " />
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="1dp"
                     android:gravity="right"
-                    android:text="12 " />
+                    android:text="14 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="15 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="16 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="17 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="18 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="19 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="20 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="21 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="22 " />
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="45dp"
+                    android:gravity="right"
+                    android:text="23 " />
+
             </LinearLayout>
 
 
-            <LinearLayout
+            <GridView
+                android:id="@+id/weekly_schedule_grid_view_am"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="9.25"
-                android:orientation="vertical">
-
-                <GridView
-                    android:id="@+id/weekly_schedule_grid_view_am"
-                    android:layout_width="wrap_content"
-                    android:layout_height="580dp"
-                    android:background="@android:color/black"
-                    android:horizontalSpacing="1dp"
-                    android:numColumns="7"
-                    android:verticalSpacing="1dp" />
-
-                <Button
-                    android:id="@+id/btn_slide_down"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-            </LinearLayout>
+                android:background="@color/uwWhite"
+                android:horizontalSpacing="1dp"
+                android:numColumns="7"/>
 
         </LinearLayout>
-    </LinearLayout>
     </ScrollView>
 </FrameLayout>

@@ -5,13 +5,6 @@
         android:id="@+id/create_event_item"
         android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/icon_add"
-        />
-
-    <item
-        android:id="@+id/add_event_item"
-        android:title=""
-        app:showAsAction="always"
-        android:icon="@drawable/icon_check"
+        android:icon="@drawable/icon_add2"
         />
 </menu>

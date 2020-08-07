@@ -35,11 +35,11 @@ import edu.tacoma.uw.tslinard.tcss450team2project.R;
 import edu.tacoma.uw.tslinard.tcss450team2project.authenticate.SignInActivity;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.AddEventFragment;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.CalendarFragment;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.toDoList.ToDoListFragment;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyScedule.WeeklyScheduleFragmentAM;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.todolist.ToDoListFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule.WeeklyScheduleFragment;
 
 /**
- * Activity class to control 3 different fragments: CalendarFragment, ToDoListFragment, WeeklyScheduleFragmentAM.
+ * Activity class to control 3 different fragments: CalendarFragment, ToDoListFragment, WeeklyScheduleFragment.
  * It connects to the backend database through AsyncTask and GET/POST event data.
  * It contains drawer menu to navigate different fragments.
  *
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
     private boolean mAddEventMode;
     private boolean mWeeklyScheduleMode;
     private CalendarFragment mCalendarFragment;
-    private WeeklyScheduleFragmentAM mWeeklyScheduleFragmentAM;
+    private WeeklyScheduleFragment mWeeklyScheduleFragment;
     private List<Events> mEventsList = new ArrayList<>();
 
     /**
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("HuskyCal");
 
         // We have set this class' theme to "@style/AppTheme.NoActionBar"
         // so we need a toolbar
@@ -92,12 +93,12 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         mCalendarFragment = new CalendarFragment();
-        mWeeklyScheduleFragmentAM = new WeeklyScheduleFragmentAM();
+        mWeeklyScheduleFragment = new WeeklyScheduleFragment();
 
         // Opens up the weekly schedule fragment once this activity is loaded
         mWeeklyScheduleMode = true;
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, mWeeklyScheduleFragmentAM)
+                .replace(R.id.fragment_container, mWeeklyScheduleFragment)
                 .commit();
         navigationView.setCheckedItem(R.id.nav_weekly_schedule);
         getEvents();
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_weekly_schedule:
                 mWeeklyScheduleMode = true;
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, mWeeklyScheduleFragmentAM).commit();
+                        .replace(R.id.fragment_container, mWeeklyScheduleFragment).commit();
                 getEvents();
                 break;
             case R.id.nav_calendar:
@@ -127,12 +128,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_to_do_list:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new ToDoListFragment()).commit();
-                break;
-            case R.id.nav_share:
-                Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.nav_send:
-                Toast.makeText(this, "Send", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_signout:
                 Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show();
@@ -258,7 +253,7 @@ public class MainActivity extends AppCompatActivity
                     if (!mAddEventMode) {
                         mEventsList = Events.parseEventsJson(jsonObject.getString("events"));
                         if(mWeeklyScheduleMode){
-                            mWeeklyScheduleFragmentAM.setEventsList(mEventsList);
+                            mWeeklyScheduleFragment.setEventsList(mEventsList);
                         } else {
                             mCalendarFragment.setEventsList(mEventsList);
                         }
