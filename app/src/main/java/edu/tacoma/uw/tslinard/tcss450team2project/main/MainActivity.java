@@ -36,10 +36,10 @@ import edu.tacoma.uw.tslinard.tcss450team2project.authenticate.SignInActivity;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.AddEventFragment;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.CalendarFragment;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.toDoList.ToDoListFragment;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyScedule.WeeklyScheduleFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyScedule.WeeklyScheduleFragmentAM;
 
 /**
- * Activity class to control 3 different fragments: CalendarFragment, ToDoListFragment, WeeklyScheduleFragment.
+ * Activity class to control 3 different fragments: CalendarFragment, ToDoListFragment, WeeklyScheduleFragmentAM.
  * It connects to the backend database through AsyncTask and GET/POST event data.
  * It contains drawer menu to navigate different fragments.
  *
@@ -54,7 +54,9 @@ public class MainActivity extends AppCompatActivity
     private JSONObject mAddEventJSON;
     private JSONObject mGetEventsJSON;
     private boolean mAddEventMode;
+    private boolean mWeeklyScheduleMode;
     private CalendarFragment mCalendarFragment;
+    private WeeklyScheduleFragmentAM mWeeklyScheduleFragmentAM;
     private List<Events> mEventsList = new ArrayList<>();
 
     /**
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Retrieves email from sharedPreferences object
+        // Retrieves email string from sharedPreferences object
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
         mEmail = sharedPreferences.getString(getString(R.string.PASSEMAIL), "");
 
@@ -85,17 +87,19 @@ public class MainActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         TextView emailTextView = (TextView) headerView.findViewById(R.id.tv_display_email);
         emailTextView.setText(mEmail);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Opens calendar fragment once this activity is loaded
         mCalendarFragment = new CalendarFragment();
+        mWeeklyScheduleFragmentAM = new WeeklyScheduleFragmentAM();
+
+        // Opens up the weekly schedule fragment once this activity is loaded
+        mWeeklyScheduleMode = true;
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, mCalendarFragment)
+                .replace(R.id.fragment_container, mWeeklyScheduleFragmentAM)
                 .commit();
-        navigationView.setCheckedItem(R.id.nav_calendar);
+        navigationView.setCheckedItem(R.id.nav_weekly_schedule);
         getEvents();
     }
 
@@ -109,12 +113,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_weekly_schedule:
+                mWeeklyScheduleMode = true;
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new WeeklyScheduleFragment()).commit();
+                        .replace(R.id.fragment_container, mWeeklyScheduleFragmentAM).commit();
+                getEvents();
                 break;
             case R.id.nav_calendar:
+                mWeeklyScheduleMode = false;
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, mCalendarFragment).commit();
+                getEvents();
                 break;
             case R.id.nav_to_do_list:
                 getSupportFragmentManager().beginTransaction()
@@ -249,8 +257,11 @@ public class MainActivity extends AppCompatActivity
                 if (jsonObject.getBoolean("success")) {
                     if (!mAddEventMode) {
                         mEventsList = Events.parseEventsJson(jsonObject.getString("events"));
-                        mCalendarFragment.setEventsList(mEventsList);
-                        mCalendarFragment.updateCalendar();
+                        if(mWeeklyScheduleMode){
+                            mWeeklyScheduleFragmentAM.setEventsList(mEventsList);
+                        } else {
+                            mCalendarFragment.setEventsList(mEventsList);
+                        }
 
                         Toast.makeText(getApplicationContext(), "Events retrieved successfully"
                                 , Toast.LENGTH_SHORT).show();

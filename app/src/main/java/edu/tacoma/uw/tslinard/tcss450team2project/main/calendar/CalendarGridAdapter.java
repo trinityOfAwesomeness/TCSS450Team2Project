@@ -26,18 +26,18 @@ import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
  * Class to display single cell of the calendar.
  * It is an adapter class which connects the data and the view.
  */
-public class GridAdapter extends ArrayAdapter {
+public class CalendarGridAdapter extends ArrayAdapter {
 
     private List<Date> mPageDates;
     private Calendar mCurrentDate;
     private List<Events> mEventsList;
     private LayoutInflater mInflater;
 
-    public GridAdapter(@NonNull Context context, List<Date> pageDates, Calendar currentDate, List<Events> events) {
-        super(context, R.layout.layout_single_cell_day);
-        this.mPageDates = pageDates;
-        this.mCurrentDate = currentDate;
-        this.mEventsList = events;
+    public CalendarGridAdapter(@NonNull Context context, List<Date> pageDates, Calendar currentDate, List<Events> events) {
+        super(context, R.layout.layout_single_cell_calendar);
+        mPageDates = pageDates;
+        mCurrentDate = currentDate;
+        mEventsList = events;
         mInflater = LayoutInflater.from(context);
     }
 
@@ -81,8 +81,8 @@ public class GridAdapter extends ArrayAdapter {
 
             // Inflates view with layout if it is created for the first time. (Similar to recyclerview)
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.layout_single_cell_dayofweek, parent, false);
-                convertView.setBackgroundColor(getContext().getResources().getColor(R.color.white));
+                convertView = mInflater.inflate(R.layout.layout_single_cell_calendar_dayofweek, parent, false);
+                convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwWhite));
                 TextView dayOfWeekTextView = convertView.findViewById(R.id.tv_calendar_dayofweek);
                 dayOfWeekTextView.setText(dayOfWeek);
             }
@@ -100,14 +100,14 @@ public class GridAdapter extends ArrayAdapter {
 
             // Inflates view with layout if it is created for the first time. (Similar to recyclerview)
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.layout_single_cell_day, parent, false);
+                convertView = mInflater.inflate(R.layout.layout_single_cell_calendar, parent, false);
             }
 
 
             TextView calendarDayTextView = convertView.findViewById(R.id.tv_calendar_day);
             TextView numberOfEventsTextView = convertView.findViewById(R.id.tv_number_of_events);
             // Set the background color of a cell to white
-            convertView.setBackgroundColor(getContext().getResources().getColor(R.color.white));
+            convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwWhite));
             // Deepen color of the day's text view if the day is in the current month
             if (displayMonth == currentMonth && displayYear == currentYear) {
                 calendarDayTextView.setTextColor(Color.parseColor("#FF000000"));
@@ -124,7 +124,7 @@ public class GridAdapter extends ArrayAdapter {
             Calendar eventCalendar = Calendar.getInstance();
             ArrayList<Events> currentDateEvents = new ArrayList<>();
             for (int i = 0; i < mEventsList.size(); i++) {
-                Date date = convertStringToDate(mEventsList.get(i).getStartDate());
+                Date date = convertStringToDate(mEventsList.get(i).getEndDate());
                 eventCalendar.setTime(date);
                 if (displayDay == eventCalendar.get(Calendar.DAY_OF_MONTH) && displayMonth == eventCalendar.get(Calendar.MONTH) + 1
                         && displayYear == eventCalendar.get(Calendar.YEAR)) {
@@ -161,31 +161,8 @@ public class GridAdapter extends ArrayAdapter {
      */
     @Override
     public int getCount() {
-        return mPageDates.size() + 7; //42
+        return mPageDates.size() + 7; //49
     }
 
 
-    /**
-     * Get position of the item
-     *
-     * @param item - the item
-     * @return - the position of the item
-     */
-    @Override
-    public int getPosition(@Nullable Object item) {
-        return mPageDates.indexOf(item);
-    }
-
-
-    /**
-     * Get item according to position
-     *
-     * @param position - the index of an item
-     * @return - the item
-     */
-    @Nullable
-    @Override
-    public Object getItem(int position) {
-        return mPageDates.get(position);
-    }
 }

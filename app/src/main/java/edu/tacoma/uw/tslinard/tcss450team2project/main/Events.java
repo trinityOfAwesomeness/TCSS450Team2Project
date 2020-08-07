@@ -4,8 +4,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Events class for calendar and weekly schedule.
@@ -81,5 +85,26 @@ public class Events {
             }
         }
         return eventsList;
+    }
+
+    /**
+     * Covert string representation of a date into Date object.
+     *
+     * @param eventDate - string representation of a date
+     * @return - Date object
+     */
+    public static Date convertStringToDate(String eventDate) {
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format.parse(eventDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public String toString(){
+        return mEndDate;
     }
 }

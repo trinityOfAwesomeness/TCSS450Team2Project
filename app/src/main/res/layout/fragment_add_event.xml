@@ -36,8 +36,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:background="#ffffff"
-                android:text="Start Date" />
+                android:textColor="@android:color/black"
+                android:background="@color/uwWhite"
+                android:text=" Start Date " />
         </RelativeLayout>
 
         <RelativeLayout
@@ -66,8 +67,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:background="#ffffff"
-                android:text="Start Time" />
+                android:textColor="@android:color/black"
+                android:background="@color/uwWhite"
+                android:text=" Start Time " />
         </RelativeLayout>
 
         <RelativeLayout
@@ -96,8 +98,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:background="#ffffff"
-                android:text="End Date" />
+                android:textColor="@android:color/black"
+                android:background="@color/uwWhite"
+                android:text=" End Date " />
         </RelativeLayout>
 
         <RelativeLayout
@@ -126,8 +129,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:background="#ffffff"
-                android:text="End Time" />
+                android:textColor="@android:color/black"
+                android:background="@color/uwWhite"
+                android:text=" End Time " />
         </RelativeLayout>
 
         <RelativeLayout
@@ -154,8 +158,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:background="#ffffff"
-                android:text="Event Name" />
+                android:textColor="@android:color/black"
+                android:background="@color/uwWhite"
+                android:text=" Event Name " />
         </RelativeLayout>
 
         <RelativeLayout
@@ -184,8 +189,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="7dp"
-                android:background="#ffffff"
-                android:text="Note (optional)" />
+                android:textColor="@android:color/black"
+                android:background="@color/uwWhite"
+                android:text=" Note (optional) " />
         </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

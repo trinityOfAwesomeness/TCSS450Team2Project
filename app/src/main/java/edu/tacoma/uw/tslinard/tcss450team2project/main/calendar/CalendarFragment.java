@@ -1,6 +1,7 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.calendar;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,16 +38,19 @@ public class CalendarFragment extends Fragment {
 
     private static final int MAX_CALENDAR_DAYS = 42;
 
-    private ImageButton mNextMonthImageButton, mPreviousMonthImageButton;
+    private View mView;
+    private ImageButton mNextMonthImageButton;
+    private ImageButton mPreviousMonthImageButton;
     private TextView mCurrentDateTextView;
     private GridView mGridView;
-    private GridAdapter mGridAdapter;
+    private CalendarGridAdapter mCalendarGridAdapter;
     private AlertDialog mAlertDialog;
-    private View mView;
-    private Calendar mMainCalendar = Calendar.getInstance(Locale.ENGLISH);       // calendar set according to today's date
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
-    private List<Date> mPageDates = new ArrayList<>();
-    private List<Events> mEventsList = new ArrayList<>();
+    private List<Date> mPageDates;
+    private List<Events> mEventsList;
+    private Calendar mMainCalendar;
+    private SimpleDateFormat mMonthYearFormat;
+    private SimpleDateFormat mDateFormat;
+
     /**
      * Called to do initial creation of CalendarFragment.
      *
@@ -55,6 +59,11 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mMainCalendar = Calendar.getInstance(Locale.ENGLISH);       // set Calendar according to today's date
+        mMonthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
+        mDateFormat = new SimpleDateFormat("M/d/yyyy", Locale.ENGLISH);
+        mPageDates = new ArrayList<>();
+        mEventsList = new ArrayList<>();
         setHasOptionsMenu(true);
     }
 
@@ -75,7 +84,7 @@ public class CalendarFragment extends Fragment {
         mNextMonthImageButton = mView.findViewById(R.id.ib_next);
         mPreviousMonthImageButton = mView.findViewById(R.id.ib_previous);
         mCurrentDateTextView = mView.findViewById(R.id.tv_current_Date);
-        mGridView = mView.findViewById(R.id.grid_view);
+        mGridView = mView.findViewById(R.id.calendar_grid_view);
 
         // Update the calendar with current month's dates when this fragment is initialized
         updateCalendar();
@@ -98,34 +107,50 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-        // Display list of clicked day's events
+        // Display list of selected day's events
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 7) {
-                    Date date = mPageDates.get(position - 7);
-                    if (!collectEventsByDate(date).isEmpty()) {
-                        // display list of events using AlertDialog which has recyclerView in it.
-                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                        builder.setCancelable(true);
-                        View displayView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_display_events, null);
-                        RecyclerView recyclerView = displayView.findViewById(R.id.events_recycle_view);
-                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(displayView.getContext());
-                        recyclerView.setLayoutManager(layoutManager);
-                        recyclerView.setHasFixedSize(true);
-                        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(displayView.getContext()
-                                , collectEventsByDate(date));
-                        recyclerView.setAdapter(eventRecyclerAdapter);
-                        eventRecyclerAdapter.notifyDataSetChanged();
-                        builder.setView(displayView);
-                        mAlertDialog = builder.create();
-                        mAlertDialog.show();
+                    Date selectedDate = mPageDates.get(position - 7);
+                    if (!collectEventsByDate(selectedDate).isEmpty()) {
+                        openEventDialog(view, selectedDate);
                     }
                 }
             }
         });
 
         return mView;
+    }
+
+    /**
+     * Opens up the dialog and display list of events using recycle view.
+     * @param view - the fragment's view
+     * @param selectedDate - the selected date to show events
+     */
+    private void openEventDialog(View view, Date selectedDate){
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.layout_dialog_events, null);
+
+        // set recycler view
+        RecyclerView recyclerView = dialogView.findViewById(R.id.events_recycle_view);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(dialogView.getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(dialogView.getContext()
+                , collectEventsByDate(selectedDate));
+        recyclerView.setAdapter(eventRecyclerAdapter);
+
+        String stringDate = mDateFormat.format(selectedDate);
+        builder.setView(dialogView)
+                .setTitle("Events on " + stringDate)
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 
     /**
@@ -168,11 +193,10 @@ public class CalendarFragment extends Fragment {
      * @return - list of events corresponding to the input date.
      */
     private ArrayList<Events> collectEventsByDate(Date date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("M/d/yyyy", Locale.ENGLISH);
-        String selectedDate = simpleDateFormat.format(date);
+        String selectedDate = mDateFormat.format(date);
         ArrayList<Events> selectedDateEvents = new ArrayList<>();
         for (int i = 0; i < mEventsList.size(); i++) {
-            String compareDate = mEventsList.get(i).getStartDate();
+            String compareDate = mEventsList.get(i).getEndDate();
             if (selectedDate.equals(compareDate)) {
                 selectedDateEvents.add(mEventsList.get(i));
             }
@@ -183,11 +207,11 @@ public class CalendarFragment extends Fragment {
 
     /**
      * Sets up a page of calendar based on the current month.
-     * It sets up total number of 42 days of month including all the days of the current month
+     * It sets up total number of 42 days for each month including all the days of the current month
      * and a few days from previous/next months to make calendar look organized.
      */
-    public void updateCalendar() {
-        String currentDate = mDateFormat.format(mMainCalendar.getTime());
+    private void updateCalendar() {
+        String currentDate = mMonthYearFormat.format(mMainCalendar.getTime());
         mCurrentDateTextView.setText(currentDate);
         mPageDates.clear();
 
@@ -196,14 +220,14 @@ public class CalendarFragment extends Fragment {
         pageCalendar.set(Calendar.DAY_OF_MONTH, 1);
         int firstDayofWeekOfCurrentMonth = pageCalendar.get(Calendar.DAY_OF_WEEK) - 1;
         pageCalendar.add(Calendar.DAY_OF_MONTH, -firstDayofWeekOfCurrentMonth);
-
+        //add total number of 42 days to mPageDates list
         while (mPageDates.size() < MAX_CALENDAR_DAYS) {
             mPageDates.add(pageCalendar.getTime());
             pageCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        mGridAdapter = new GridAdapter(mView.getContext(), mPageDates, mMainCalendar, mEventsList);
-        mGridView.setAdapter(mGridAdapter);
+        mCalendarGridAdapter = new CalendarGridAdapter(mView.getContext(), mPageDates, mMainCalendar, mEventsList);
+        mGridView.setAdapter(mCalendarGridAdapter);
     }
 
     /**
@@ -213,6 +237,7 @@ public class CalendarFragment extends Fragment {
      */
     public void setEventsList(List<Events> events) {
         mEventsList = events;
+        updateCalendar();
     }
 
     /**
