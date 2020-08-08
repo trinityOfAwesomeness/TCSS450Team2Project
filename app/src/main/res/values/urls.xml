@@ -10,4 +10,8 @@
     <string name = "get_weekly_events">https://tslinard-calendarapp-backend.herokuapp.com/weeklyevents</string>
     <string name = "edit_weekly_event">https://tslinard-calendarapp-backend.herokuapp.com/editweeklyevent</string>
     <string name = "delete_weekly_event">https://tslinard-calendarapp-backend.herokuapp.com/deleteweeklyevent</string>
+    <string name = "add_task">https://tslinard-calendarapp-backend.herokuapp.com/addtask</string>
+    <string name = "get_tasks">https://tslinard-calendarapp-backend.herokuapp.com/tasks</string>
+    <string name = "edit_task">https://tslinard-calendarapp-backend.herokuapp.com/edittask</string>
+    <string name = "delete_task">https://tslinard-calendarapp-backend.herokuapp.com/deletetask</string>
 </resources>
