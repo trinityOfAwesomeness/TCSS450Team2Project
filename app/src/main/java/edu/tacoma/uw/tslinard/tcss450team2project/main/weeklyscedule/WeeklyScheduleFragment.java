@@ -1,7 +1,11 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,13 +16,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
 
 /**
  * Class to create and control the Weekly Schedule page.
@@ -26,10 +26,10 @@ import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
  * @author Tatiana Linardopoulou
  */
 public class WeeklyScheduleFragment extends Fragment {
+    private AlertDialog mAlertDialog;
     private View mView;
     private GridView mGridView;
-    private List<Events> mEventsList;
-    private List<Date> mCurrentWeekDateList;
+    private List<WeeklyEvent> mWeeklyEventList;
     private WeeklyScheduleGridAdapter mWeeklyScheduleGridAdapter;
 
     /**
@@ -40,8 +40,7 @@ public class WeeklyScheduleFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEventsList = new ArrayList<>();
-        mCurrentWeekDateList = getCurrentWeekDates();
+        mWeeklyEventList = new ArrayList<>();
         setHasOptionsMenu(true);
     }
 
@@ -74,55 +73,69 @@ public class WeeklyScheduleFragment extends Fragment {
 
         return mView;
     }
+//
+//    /**
+//     * Opens up the dialog and display list of events using recycle view.
+//     * @param view - the fragment's view
+//     * @param selectedDate - the selected date to show events
+//     */
+//    private void openEventDialog(View view, Date selectedDate){
+//        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+//        LayoutInflater inflater = getActivity().getLayoutInflater();
+//        View dialogView = inflater.inflate(R.layout.dialog_events, null);
+//
+//        // set recycler view
+//        RecyclerView recyclerView = dialogView.findViewById(R.id.events_recycle_view);
+//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(dialogView.getContext());
+//        recyclerView.setLayoutManager(layoutManager);
+//        String stringDate = mDateFormat.format(selectedDate);
+//        builder.setView(dialogView)
+//                .setTitle("Events on " + stringDate)
+//                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                    }
+//                });
+//        mAlertDialog = builder.create();
+//        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(this,
+//                mAlertDialog, collectEventsByDate(selectedDate));
+//        eventRecyclerAdapter.notifyDataSetChanged();
+//        recyclerView.setAdapter(eventRecyclerAdapter);
+//        mAlertDialog.show();
+//    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.add_item) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new AddWeeklyEventFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void updateWeeklySchedule() {
-//        Toast.makeText(getActivity(), extractEventsInCurrentWeek(mEventsList).toString() + "KK"
-//                , Toast.LENGTH_SHORT).show();
-        mWeeklyScheduleGridAdapter = new WeeklyScheduleGridAdapter(mView.getContext(), mCurrentWeekDateList,
-                extractEventsInCurrentWeek(mEventsList));
+        Toast.makeText(getActivity(), "Weekly Events: " + mWeeklyEventList.toString()
+                , Toast.LENGTH_SHORT).show();
+        mWeeklyScheduleGridAdapter = new WeeklyScheduleGridAdapter(mView.getContext(), mWeeklyEventList);
         mGridView.setAdapter(mWeeklyScheduleGridAdapter);
     }
 
-    private List<Events> extractEventsInCurrentWeek(List<Events> allEvents){
-        List<Events> eventsInCurrentWeek = new ArrayList<>();
-        Calendar eventCalendar = Calendar.getInstance();
-        Calendar dateCalendar = Calendar.getInstance();
-        for(Events event: allEvents) {
-            Date eventEndDate = Events.convertStringToDate(event.getEndDate());
-            eventCalendar.setTime(eventEndDate);
-            for(Date date: mCurrentWeekDateList) {
-                dateCalendar.setTime(date);
-                if (dateCalendar.get(Calendar.DAY_OF_MONTH) == eventCalendar.get(Calendar.DAY_OF_MONTH)
-                        && dateCalendar.get(Calendar.MONTH) + 1 == eventCalendar.get(Calendar.MONTH) + 1
-                        && dateCalendar.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR)) {
-                    eventsInCurrentWeek.add(event);
-                }
-            }
-        }
-        return eventsInCurrentWeek;
-    }
-
-    // Get dates of the current week
-    private List<Date> getCurrentWeekDates(){
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        List<Date> currentWeekDateList = new ArrayList<>();
-        int currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-        calendar.add(Calendar.DAY_OF_MONTH, -currentDayOfWeek);
-        while (currentWeekDateList.size() < 7) {
-            currentWeekDateList.add(calendar.getTime());
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-        return currentWeekDateList;
-    }
-
-
-    /**
-     * Sets up list of events.
-     *
-     * @param events - list of events to be set
-     */
-    public void setEventsList(List<Events> events) {
-        mEventsList = events;
+    public void setWeeklyEventList(List<WeeklyEvent> weeklyEventList) {
+        mWeeklyEventList = weeklyEventList;
         updateWeeklySchedule();
+    }
+
+    public interface GetWeeklyEventsListener {
+        void getWeeklyEvents();
     }
 }

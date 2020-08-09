@@ -23,9 +23,10 @@ import edu.tacoma.uw.tslinard.tcss450team2project.R;
  * @author Seoungdeok Jeon
  * @author Tatiana Linardopoulou
  */
-public class AddEventFragment extends Fragment implements View.OnClickListener {
+public class EditEventFragment extends Fragment implements View.OnClickListener {
 
-    private AddMonthlyEventListener mAddMonthlyEventListener;
+    private Events mEvent;
+    private EditMonthlyEventListener mEditMonthlyEventListener;
 
     private EditText mStartDateEditText, mStartTimeEditText, mEndDateEditText, mEndTimeEditText,
             mEventNameEditText, mNoteEditText;
@@ -33,6 +34,9 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Calendar mCalendar;
 
+    public EditEventFragment(Events event){
+        mEvent = event;
+    }
     /**
      * Called to do initial creation of AddEventFragment.
      *
@@ -41,7 +45,7 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAddMonthlyEventListener = (AddMonthlyEventListener) getActivity();
+        mEditMonthlyEventListener = (EditMonthlyEventListener) getActivity();
     }
 
     /**
@@ -57,15 +61,7 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_event, container, false);
-        getActivity().setTitle("Add Event");
-
-        mStartDateEditText = view.findViewById(R.id.et_start_date);
-        mStartTimeEditText = view.findViewById(R.id.et_start_time);
-        mEndDateEditText = view.findViewById(R.id.et_end_date);
-        mEndTimeEditText = view.findViewById(R.id.et_end_time);
-        mEventNameEditText = view.findViewById(R.id.et_event_name);
-        mNoteEditText = view.findViewById(R.id.et_note);
-        mSaveEventButton = view.findViewById(R.id.btn_save_event);
+        getActivity().setTitle("Edit Event");
 
         // get today's date
         mCalendar = Calendar.getInstance();
@@ -75,10 +71,20 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
         mHour = mCalendar.get(Calendar.HOUR_OF_DAY);
         mMinute = mCalendar.get(Calendar.MINUTE);
 
-        mStartDateEditText.setText((mMonth + 1) + "/" + mDay + "/" + mYear);
-        mStartTimeEditText.setText(String.format("%02d:%02d", mHour, mMinute));
-        mEndDateEditText.setText((mMonth + 1) + "/" + mDay + "/" + mYear);
-        mEndTimeEditText.setText(String.format("%02d:%02d", mHour, mMinute));
+        mStartDateEditText = view.findViewById(R.id.et_start_date);
+        mStartTimeEditText = view.findViewById(R.id.et_start_time);
+        mEndDateEditText = view.findViewById(R.id.et_end_date);
+        mEndTimeEditText = view.findViewById(R.id.et_end_time);
+        mEventNameEditText = view.findViewById(R.id.et_event_name);
+        mNoteEditText = view.findViewById(R.id.et_note);
+        mSaveEventButton = view.findViewById(R.id.btn_save_event);
+
+        mStartDateEditText.setText(mEvent.getStartDate());
+        mStartTimeEditText.setText(mEvent.getStartTime());
+        mEndDateEditText.setText(mEvent.getEndDate());
+        mEndTimeEditText.setText(mEvent.getEndTime());
+        mEventNameEditText.setText(mEvent.getEventName());
+        mNoteEditText.setText(mEvent.getNote());
 
         mStartDateEditText.setOnClickListener(this);
         mStartTimeEditText.setOnClickListener(this);
@@ -143,23 +149,22 @@ public class AddEventFragment extends Fragment implements View.OnClickListener {
             String endTime = mEndTimeEditText.getText().toString();
             String eventName = mEventNameEditText.getText().toString();
             String note = mNoteEditText.getText().toString();
-            Events event = new Events(null, startDate, startTime, endDate, endTime, eventName, note);
-            if (mAddMonthlyEventListener != null) {
-                mAddMonthlyEventListener.addMonthlyEvent(event);
+
+            mEvent.setStartDate(startDate);
+            mEvent.setStartTime(startTime);
+            mEvent.setEndDate(endDate);
+            mEvent.setEndTime(endTime);
+            mEvent.setEventName(eventName);
+            mEvent.setNote(note);
+
+            if (mEditMonthlyEventListener != null) {
+                mEditMonthlyEventListener.editMonthlyEvent(mEvent);
             }
         }
     }
 
-    /**
-     * Interface for adding an event.
-     */
-    public interface AddMonthlyEventListener {
-        /**
-         * Add a new event through
-         * posting the event to the web service.
-         *
-         * @param event - event to be added
-         */
-        void addMonthlyEvent(Events event);
+
+    public interface EditMonthlyEventListener {
+        void editMonthlyEvent(Events event);
     }
 }

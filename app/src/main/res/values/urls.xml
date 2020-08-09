@@ -2,14 +2,17 @@
 <resources>
     <string name = "register">https://tslinard-calendarapp-backend.herokuapp.com/register</string>
     <string name = "login">https://tslinard-calendarapp-backend.herokuapp.com/login</string>
+
     <string name = "add_event">https://tslinard-calendarapp-backend.herokuapp.com/addevent</string>
     <string name = "get_events">https://tslinard-calendarapp-backend.herokuapp.com/events</string>
     <string name = "edit_event">https://tslinard-calendarapp-backend.herokuapp.com/editevent</string>
     <string name = "delete_event">https://tslinard-calendarapp-backend.herokuapp.com/deleteevent</string>
+
     <string name = "add_weekly_event">https://tslinard-calendarapp-backend.herokuapp.com/addweeklyevent</string>
     <string name = "get_weekly_events">https://tslinard-calendarapp-backend.herokuapp.com/weeklyevents</string>
     <string name = "edit_weekly_event">https://tslinard-calendarapp-backend.herokuapp.com/editweeklyevent</string>
     <string name = "delete_weekly_event">https://tslinard-calendarapp-backend.herokuapp.com/deleteweeklyevent</string>
+
     <string name = "add_task">https://tslinard-calendarapp-backend.herokuapp.com/addtask</string>
     <string name = "get_tasks">https://tslinard-calendarapp-backend.herokuapp.com/tasks</string>
     <string name = "edit_task">https://tslinard-calendarapp-backend.herokuapp.com/edittask</string>

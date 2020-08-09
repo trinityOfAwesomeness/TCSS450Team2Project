@@ -1,4 +1,4 @@
-package edu.tacoma.uw.tslinard.tcss450team2project.main;
+package edu.tacoma.uw.tslinard.tcss450team2project.main.calendar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +70,31 @@ public class Events {
 
     public String getNote() {
         return mNote;
+    }
+
+
+    public void setStartDate(String startDate) {
+        mStartDate = startDate;
+    }
+
+    public void setStartTime(String startTime) {
+        mStartTime = startTime;
+    }
+
+    public void setEndDate(String endDate) {
+        mEndDate = endDate;
+    }
+
+    public void setEndTime(String endTime) {
+        mEndTime = endTime;
+    }
+
+    public void setEventName(String eventName) {
+        mEventName = eventName;
+    }
+
+    public void setNote(String note) {
+        mNote = note;
     }
 
     /**

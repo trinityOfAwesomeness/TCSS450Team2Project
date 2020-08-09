@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_weekly_schedule"
+        android:id="@+id/tv_display_event_name"
         android:text=""
         android:textStyle="bold"
         android:layout_gravity="center"

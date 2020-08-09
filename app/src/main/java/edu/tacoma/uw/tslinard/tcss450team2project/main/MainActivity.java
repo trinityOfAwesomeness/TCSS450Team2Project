@@ -28,14 +28,22 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 import edu.tacoma.uw.tslinard.tcss450team2project.authenticate.SignInActivity;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.AddEventFragment;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.CalendarFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.EditEventFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.EventRecyclerAdapter;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.Events;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.todolist.AddTaskFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.todolist.EditTaskFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.todolist.Task;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.todolist.TaskRecyclerAdapter;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.todolist.ToDoListFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule.AddWeeklyEventFragment;
+import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule.WeeklyEvent;
 import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule.WeeklyScheduleFragment;
 
 /**
@@ -47,17 +55,41 @@ import edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule.WeeklySched
  * @author Tatiana Linardopoulou
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AddEventFragment.AddEventListener, CalendarFragment.GetEventsListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        CalendarFragment.GetMonthlyEventsListener, AddEventFragment.AddMonthlyEventListener,
+        EventRecyclerAdapter.DeleteMonthlyEventListener, EditEventFragment.EditMonthlyEventListener,
+        WeeklyScheduleFragment.GetWeeklyEventsListener, AddWeeklyEventFragment.AddWeeklyEventListener,
+        ToDoListFragment.GetTasksListener, AddTaskFragment.AddTaskListener,
+        TaskRecyclerAdapter.DeleteTaskListener, EditTaskFragment.EditTaskListener {
 
     private String mEmail;
     private DrawerLayout mDrawer;
-    private JSONObject mAddEventJSON;
-    private JSONObject mGetEventsJSON;
-    private boolean mAddEventMode;
-    private boolean mWeeklyScheduleMode;
+
+    private boolean mGetMonthlyEventsMode;
+    private boolean mAddMonthlyEventMode;
+    private boolean mDeleteMonthlyEventMode;
+    private boolean mEditMonthlyEventMode;
+    private JSONObject mGetMonthlyEventsJSON;
+    private JSONObject mAddMonthlyEventJSON;
+    private JSONObject mDeleteMonthlyEventJSON;
+    private JSONObject mEditMonthlyEventJSON;
     private CalendarFragment mCalendarFragment;
+
+    private boolean mGetWeeklyEventsMode;
+    private boolean mAddWeeklyEventMode;
+    private JSONObject mGetWeeklyEventsJSON;
+    private JSONObject mAddWeeklyEventJSON;
     private WeeklyScheduleFragment mWeeklyScheduleFragment;
-    private List<Events> mEventsList = new ArrayList<>();
+
+    private boolean mGetTasksMode;
+    private boolean mAddTaskMode;
+    private boolean mDeleteTaskMode;
+    private boolean mEditTaskMode;
+    private JSONObject mGetTasksJSON;
+    private JSONObject mAddTaskJSON;
+    private JSONObject mDeleteTaskJSON;
+    private JSONObject mEditTaskJSON;
+    private ToDoListFragment mToDoListFragment;
 
     /**
      * Called when the activity is starting.
@@ -94,14 +126,14 @@ public class MainActivity extends AppCompatActivity
 
         mCalendarFragment = new CalendarFragment();
         mWeeklyScheduleFragment = new WeeklyScheduleFragment();
+        mToDoListFragment = new ToDoListFragment();
 
         // Opens up the weekly schedule fragment once this activity is loaded
-        mWeeklyScheduleMode = true;
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mWeeklyScheduleFragment)
                 .commit();
         navigationView.setCheckedItem(R.id.nav_weekly_schedule);
-        getEvents();
+        getWeeklyEvents();
     }
 
     /**
@@ -114,20 +146,19 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_weekly_schedule:
-                mWeeklyScheduleMode = true;
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, mWeeklyScheduleFragment).commit();
-                getEvents();
+                getWeeklyEvents();
                 break;
             case R.id.nav_calendar:
-                mWeeklyScheduleMode = false;
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, mCalendarFragment).commit();
-                getEvents();
+                getMonthlyEvents();
                 break;
             case R.id.nav_to_do_list:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ToDoListFragment()).commit();
+                        .replace(R.id.fragment_container, mToDoListFragment).commit();
+                getTasks();
                 break;
             case R.id.nav_signout:
                 Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show();
@@ -144,66 +175,17 @@ public class MainActivity extends AppCompatActivity
 
 
     /**
-     * Overridden method from AddEventFragment.AddEventListener interface.
-     * It adds a new event through
-     * posting the event to the web service.
-     *
-     * @param event - event to be added
-     */
-    @Override
-    public void addEvent(Events event) {
-        mAddEventMode = true;
-        StringBuilder url = new StringBuilder(getString(R.string.add_event));
-        mAddEventJSON = new JSONObject();
-        try {
-            mAddEventJSON.put(Events.START_DATE, event.getStartDate());
-            mAddEventJSON.put(Events.START_TIME, event.getStartTime());
-            mAddEventJSON.put(Events.END_DATE, event.getEndDate());
-            mAddEventJSON.put(Events.END_TIME, event.getEndTime());
-            mAddEventJSON.put(Events.EVENT_NAME, event.getEventName());
-            mAddEventJSON.put(Events.NOTE, event.getNote());
-            mAddEventJSON.put(Events.EMAIL, mEmail);
-
-            new EventsAsyncTask().execute(url.toString());
-        } catch (JSONException e) {
-            Toast.makeText(this, "Error with JSON creation on adding event: "
-                    + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void editEvent(Events event) {
-        mAddEventMode = true;
-        StringBuilder url = new StringBuilder(getString(R.string.edit_event));
-        mAddEventJSON = new JSONObject();
-        try {
-            mAddEventJSON.put(Events.EVENT_ID, event.getEventId());
-            mAddEventJSON.put(Events.START_DATE, event.getStartDate());
-            mAddEventJSON.put(Events.START_TIME, event.getStartTime());
-            mAddEventJSON.put(Events.END_DATE, event.getEndDate());
-            mAddEventJSON.put(Events.END_TIME, event.getEndTime());
-            mAddEventJSON.put(Events.EVENT_NAME, event.getEventName());
-            mAddEventJSON.put(Events.NOTE, event.getNote());
-            mAddEventJSON.put(Events.EMAIL, mEmail);
-
-            new EventsAsyncTask().execute(url.toString());
-        } catch (JSONException e) {
-            Toast.makeText(this, "Error editing event: "
-                    + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Overridden method from CalendarFragment.GetEventsListener interface.
+     * Overridden method from CalendarFragment.GetMonthlyEventsListener interface.
      * Retrieve events from the web service.
      */
     @Override
-    public void getEvents() {
-        mAddEventMode = false;
+    public void getMonthlyEvents() {
+        mGetMonthlyEventsMode = true;
         StringBuilder url = new StringBuilder(getString(R.string.get_events));
-        mGetEventsJSON = new JSONObject();
+        mGetMonthlyEventsJSON = new JSONObject();
         try {
-            mGetEventsJSON.put(Events.EMAIL, mEmail);
-            new EventsAsyncTask().execute(url.toString());
+            mGetMonthlyEventsJSON.put(Events.EMAIL, mEmail);
+            new EventAsyncTask().execute(url.toString());
         } catch (JSONException e) {
             Toast.makeText(this, "Error in getting events: "
                     + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -211,10 +193,165 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
+     * Overridden method from AddEventFragment.AddMonthlyEventListener interface.
+     * It adds a new event through
+     * posting the event to the web service.
+     *
+     * @param event - event to be added
+     */
+    @Override
+    public void addMonthlyEvent(Events event) {
+        mAddMonthlyEventMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.add_event));
+        mAddMonthlyEventJSON = new JSONObject();
+        try {
+            mAddMonthlyEventJSON.put(Events.START_DATE, event.getStartDate());
+            mAddMonthlyEventJSON.put(Events.START_TIME, event.getStartTime());
+            mAddMonthlyEventJSON.put(Events.END_DATE, event.getEndDate());
+            mAddMonthlyEventJSON.put(Events.END_TIME, event.getEndTime());
+            mAddMonthlyEventJSON.put(Events.EVENT_NAME, event.getEventName());
+            mAddMonthlyEventJSON.put(Events.NOTE, event.getNote());
+            mAddMonthlyEventJSON.put(Events.EMAIL, mEmail);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on adding event: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    public void deleteMonthlyEvent(String eventId) {
+        mDeleteMonthlyEventMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.delete_event));
+        mDeleteMonthlyEventJSON = new JSONObject();
+        try {
+            mDeleteMonthlyEventJSON.put(Events.EVENT_ID, eventId);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on deleting event: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void editMonthlyEvent(Events event) {
+        mEditMonthlyEventMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.edit_event));
+        mEditMonthlyEventJSON = new JSONObject();
+        try {
+            mEditMonthlyEventJSON.put(Events.EVENT_ID, event.getEventId());
+            mEditMonthlyEventJSON.put(Events.START_DATE, event.getStartDate());
+            mEditMonthlyEventJSON.put(Events.START_TIME, event.getStartTime());
+            mEditMonthlyEventJSON.put(Events.END_DATE, event.getEndDate());
+            mEditMonthlyEventJSON.put(Events.END_TIME, event.getEndTime());
+            mEditMonthlyEventJSON.put(Events.EVENT_NAME, event.getEventName());
+            mEditMonthlyEventJSON.put(Events.NOTE, event.getNote());
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on editing event: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void getWeeklyEvents() {
+        mGetWeeklyEventsMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.get_weekly_events));
+        mGetWeeklyEventsJSON = new JSONObject();
+        try {
+            mGetWeeklyEventsJSON.put(Events.EMAIL, mEmail);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error in getting events: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void addWeeklyEvent(WeeklyEvent weeklyEvent) {
+        mAddWeeklyEventMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.add_weekly_event));
+        mAddWeeklyEventJSON = new JSONObject();
+        try {
+            mAddWeeklyEventJSON.put(WeeklyEvent.DAY_OF_WEEK, weeklyEvent.getDayOfWeek());
+            mAddWeeklyEventJSON.put(WeeklyEvent.START_TIME, weeklyEvent.getStartTime());
+            mAddWeeklyEventJSON.put(WeeklyEvent.END_TIME, weeklyEvent.getEndTime());
+            mAddWeeklyEventJSON.put(WeeklyEvent.EVENT_NAME, weeklyEvent.getEventName());
+            mAddWeeklyEventJSON.put(WeeklyEvent.COLOR, weeklyEvent.getColor());
+            mAddWeeklyEventJSON.put(WeeklyEvent.NOTE, weeklyEvent.getNote());
+            mAddWeeklyEventJSON.put(WeeklyEvent.EMAIL, mEmail);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on adding event: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void getTasks() {
+        mGetTasksMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.get_tasks));
+        mGetTasksJSON = new JSONObject();
+        try {
+            mGetTasksJSON.put(Events.EMAIL, mEmail);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error in getting tasks: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void addTask(Task task) {
+        mAddTaskMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.add_task));
+        mAddTaskJSON = new JSONObject();
+        try {
+            mAddTaskJSON.put(Task.TASK, task.getTask());
+            mAddTaskJSON.put(Task.STATUS, task.getStatus());
+            mAddTaskJSON.put(Task.EMAIL, mEmail);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on adding task: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void deleteTask(String toDoId) {
+        mDeleteTaskMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.delete_task));
+        mDeleteTaskJSON = new JSONObject();
+        try {
+            mDeleteTaskJSON.put(Task.TO_DO_ID, toDoId);
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on deleting task: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void editTask(Task task) {
+        mEditTaskMode = true;
+        StringBuilder url = new StringBuilder(getString(R.string.edit_task));
+        mEditTaskJSON = new JSONObject();
+        try {
+            mEditTaskJSON.put(Task.TO_DO_ID, task.getToDoId());
+            mEditTaskJSON.put(Task.TASK, task.getTask());
+            mEditTaskJSON.put(Task.STATUS, task.getStatus());
+            new EventAsyncTask().execute(url.toString());
+        } catch (JSONException e) {
+            Toast.makeText(this, "Error with JSON creation on editing task: "
+                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
      * Inner class which can connect to the backend database and GET/POST data to the corresponding web service.
      * It tries to add an event if mAddEventMode is set to true. Otherwise, it tries to retrieve events.
      */
-    private class EventsAsyncTask extends AsyncTask<String, Void, String> {
+    private class EventAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
             String response = "";
@@ -229,10 +366,26 @@ public class MainActivity extends AppCompatActivity
                     OutputStreamWriter wr =
                             new OutputStreamWriter(urlConnection.getOutputStream());
 
-                    if (!mAddEventMode) {
-                        wr.write(mGetEventsJSON.toString());
-                    } else {
-                        wr.write(mAddEventJSON.toString());
+                    if (mGetMonthlyEventsMode) {
+                        wr.write(mGetMonthlyEventsJSON.toString());
+                    } else if (mAddMonthlyEventMode) {
+                        wr.write(mAddMonthlyEventJSON.toString());
+                    } else if (mDeleteMonthlyEventMode) {
+                        wr.write(mDeleteMonthlyEventJSON.toString());
+                    } else if (mEditMonthlyEventMode) {
+                        wr.write(mEditMonthlyEventJSON.toString());
+                    } else if (mGetWeeklyEventsMode) {
+                        wr.write(mGetWeeklyEventsJSON.toString());
+                    } else if (mAddWeeklyEventMode) {
+                        wr.write(mAddWeeklyEventJSON.toString());
+                    } else if (mGetTasksMode) {
+                        wr.write(mGetTasksJSON.toString());
+                    } else if (mAddTaskMode) {
+                        wr.write(mAddTaskJSON.toString());
+                    } else if (mDeleteTaskMode) {
+                        wr.write(mDeleteTaskJSON.toString());
+                    } else if (mEditTaskMode) {
+                        wr.write(mEditTaskJSON.toString());
                     }
 
                     wr.flush();
@@ -247,11 +400,35 @@ public class MainActivity extends AppCompatActivity
                     }
 
                 } catch (Exception e) {
-                    if (!mAddEventMode) {
-                        response = "Unable to get events, Reason: "
+                    if (mGetMonthlyEventsMode) {
+                        response = "Unable to get monthly events, Reason: "
                                 + e.getMessage();
-                    } else {
-                        response = "Unable to add event, Reason: "
+                    } else if (mAddMonthlyEventMode) {
+                        response = "Unable to add monthly event, Reason: "
+                                + e.getMessage();
+                    } else if (mDeleteMonthlyEventMode) {
+                        response = "Unable to delete monthly event, Reason: "
+                                + e.getMessage();
+                    } else if (mEditMonthlyEventMode) {
+                        response = "Unable to edit monthly event, Reason: "
+                                + e.getMessage();
+                    } else if (mGetWeeklyEventsMode) {
+                        response = "Unable to get weekly events, Reason: "
+                                + e.getMessage();
+                    } else if (mAddWeeklyEventMode) {
+                        response = "Unable to add weekly event, Reason: "
+                                + e.getMessage();
+                    } else if (mGetTasksMode) {
+                        response = "Unable to get tasks, Reason: "
+                                + e.getMessage();
+                    } else if (mAddTaskMode) {
+                        response = "Unable to add task, Reason: "
+                                + e.getMessage();
+                    } else if (mDeleteTaskMode) {
+                        response = "Unable to delete task, Reason: "
+                                + e.getMessage();
+                    } else if (mEditTaskMode) {
+                        response = "Unable to edit task, Reason: "
                                 + e.getMessage();
                     }
                 } finally {
@@ -264,36 +441,129 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String response) {
-            if (response.startsWith("Unable to get events") || response.startsWith("Unable to add event")) {
+            if (response.startsWith("Unable to get monthly events") || response.startsWith("Unable to add monthly event") ||
+                    response.startsWith("Unable to delete monthly event") || response.startsWith("Unable to edit monthly event") ||
+                    response.startsWith("Unable to get weekly events") || response.startsWith("Unable to add weekly event") ||
+                    response.startsWith("Unable to get tasks") || response.startsWith("Unable to add task") ||
+                    response.startsWith("Unable to delete task") || response.startsWith("Unable to edit task")) {
                 Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
                 JSONObject jsonObject = new JSONObject(response);
                 if (jsonObject.getBoolean("success")) {
-                    if (!mAddEventMode) {
-                        mEventsList = Events.parseEventsJson(jsonObject.getString("events"));
-                        if(mWeeklyScheduleMode){
-                            mWeeklyScheduleFragment.setEventsList(mEventsList);
-                        } else {
-                            mCalendarFragment.setEventsList(mEventsList);
-                        }
-
-                        Toast.makeText(getApplicationContext(), "Events retrieved successfully"
+                    if (mGetMonthlyEventsMode) {
+                        List<Events> eventsList = Events.parseEventsJson(jsonObject.getString("events"));
+                        mCalendarFragment.setEventsList(eventsList);
+                        Toast.makeText(getApplicationContext(), "Monthly events retrieved successfully"
                                 , Toast.LENGTH_SHORT).show();
-                    } else {
-                        getEvents();
-                        Toast.makeText(getApplicationContext(), "Event added successfully"
+                        mGetMonthlyEventsMode = false;
+                    } else if (mAddMonthlyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly event added successfully"
                                 , Toast.LENGTH_SHORT).show();
                         getSupportFragmentManager().popBackStackImmediate();
+                        mAddMonthlyEventMode = false;
+
+                        mGetMonthlyEventsMode = true;
+                        getMonthlyEvents();
+                    } else if (mDeleteMonthlyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly event deleted successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        mDeleteMonthlyEventMode = false;
+
+                        mGetMonthlyEventsMode = true;
+                        getMonthlyEvents();
+                    } else if (mEditMonthlyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly event edited successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        getSupportFragmentManager().popBackStackImmediate();
+                        mEditMonthlyEventMode = false;
+
+                        mGetMonthlyEventsMode = true;
+                        getMonthlyEvents();
+                    } else if(mGetWeeklyEventsMode){
+                        List<WeeklyEvent> weeklyEventList = WeeklyEvent.parseWeeklyEventJson(jsonObject.getString("weeklyevents"));
+                        mWeeklyScheduleFragment.setWeeklyEventList(weeklyEventList);
+                        Toast.makeText(getApplicationContext(), "Weekly events retrieved successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        mGetWeeklyEventsMode = false;
+                    } else if (mAddWeeklyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Weekly event added successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        getSupportFragmentManager().popBackStackImmediate();
+                        mAddWeeklyEventMode = false;
+
+                        mGetWeeklyEventsMode = true;
+                        getWeeklyEvents();
+                    } else if (mGetTasksMode) {
+                        List<Task> taskList = Task.parseTasksJson(jsonObject.getString("todolist"));
+                        mToDoListFragment.setTaskList(taskList);
+                        Toast.makeText(getApplicationContext(), "Tasks retrieved successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        mGetTasksMode = false;
+                    } else if (mAddTaskMode) {
+                        Toast.makeText(getApplicationContext(), "Task added successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        getSupportFragmentManager().popBackStackImmediate();
+                        mAddTaskMode = false;
+
+                        mGetTasksMode = true;
+                        getTasks();
+                    } else if (mDeleteTaskMode) {
+                        Toast.makeText(getApplicationContext(), "Task deleted successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        mDeleteTaskMode = false;
+
+                        mGetTasksMode = true;
+                        getTasks();
+                    } else if (mEditTaskMode) {
+                        Toast.makeText(getApplicationContext(), "Task edited successfully"
+                                , Toast.LENGTH_SHORT).show();
+                        getSupportFragmentManager().popBackStackImmediate();
+                        mEditTaskMode = false;
+
+                        mGetTasksMode = true;
+                        getTasks();
                     }
                 } else {
-                    if (!mAddEventMode) {
-                        Toast.makeText(getApplicationContext(), "Events couldn't be retrieved: "
+                    if (mGetMonthlyEventsMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly events couldn't be retrieved: "
                                         + jsonObject.getString("error")
                                 , Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Event couldn't be added: "
+                    } else if (mAddMonthlyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly event couldn't be added: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mDeleteMonthlyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly event couldn't be deleted: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mEditMonthlyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Monthly event couldn't be edited: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mGetWeeklyEventsMode){
+                        Toast.makeText(getApplicationContext(), "Weekly events couldn't be retrieved: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mAddWeeklyEventMode) {
+                        Toast.makeText(getApplicationContext(), "Weekly event couldn't be added: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mGetTasksMode) {
+                        Toast.makeText(getApplicationContext(), "Tasks couldn't be retrieved: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mAddTaskMode) {
+                        Toast.makeText(getApplicationContext(), "Task couldn't be added: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mDeleteTaskMode) {
+                        Toast.makeText(getApplicationContext(), "Task couldn't be deleted: "
+                                        + jsonObject.getString("error")
+                                , Toast.LENGTH_LONG).show();
+                    } else if (mEditTaskMode) {
+                        Toast.makeText(getApplicationContext(), "Task couldn't be edited: "
                                         + jsonObject.getString("error")
                                 , Toast.LENGTH_LONG).show();
                     }
@@ -305,5 +575,4 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
 }

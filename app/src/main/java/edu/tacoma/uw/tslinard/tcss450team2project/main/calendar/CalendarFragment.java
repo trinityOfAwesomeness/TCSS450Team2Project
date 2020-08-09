@@ -21,12 +21,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
 
 /**
  * Class to create and control the Calendar page.
@@ -137,10 +138,6 @@ public class CalendarFragment extends Fragment {
         RecyclerView recyclerView = dialogView.findViewById(R.id.events_recycle_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(dialogView.getContext());
         recyclerView.setLayoutManager(layoutManager);
-        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(dialogView.getContext()
-                , collectEventsByDate(selectedDate));
-        recyclerView.setAdapter(eventRecyclerAdapter);
-
         String stringDate = mDateFormat.format(selectedDate);
         builder.setView(dialogView)
                 .setTitle("Events on " + stringDate)
@@ -150,6 +147,10 @@ public class CalendarFragment extends Fragment {
                     }
                 });
         mAlertDialog = builder.create();
+        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(this,
+                mAlertDialog, collectEventsByDate(selectedDate));
+        eventRecyclerAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(eventRecyclerAdapter);
         mAlertDialog.show();
     }
 
@@ -175,7 +176,7 @@ public class CalendarFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Launches AddEventFragment if create_event_item is selected
-        if (id == R.id.create_event_item) {
+        if (id == R.id.add_item) {
             getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new AddEventFragment())
                     .addToBackStack(null)
@@ -226,6 +227,16 @@ public class CalendarFragment extends Fragment {
 
         mCalendarGridAdapter = new CalendarGridAdapter(mView.getContext(), mPageDates, mMainCalendar, mEventsList);
         mGridView.setAdapter(mCalendarGridAdapter);
+
+        // sort monthly events by creation order
+        Collections.sort(mEventsList, new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                Events event1 = (Events) o1;
+                Events event2 = (Events) o2;
+                return event1.getEventId().compareTo(event2.getEventId());
+            }
+        });
     }
 
     /**
@@ -241,10 +252,10 @@ public class CalendarFragment extends Fragment {
     /**
      * Interface for getting events.
      */
-    public interface GetEventsListener {
+    public interface GetMonthlyEventsListener {
         /**
          * Retrieve events from the web service.
          */
-        void getEvents();
+        void getMonthlyEvents();
     }
 }

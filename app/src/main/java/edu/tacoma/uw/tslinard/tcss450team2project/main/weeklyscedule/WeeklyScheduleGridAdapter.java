@@ -1,6 +1,7 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,23 +11,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
 
 public class WeeklyScheduleGridAdapter extends ArrayAdapter {
     private LayoutInflater mInflater;
-    private List<Date> mCurrentWeekDateList;
-    private List<Events> mEventsList;
+    private List<WeeklyEvent> mWeeklyEventList;
 
-    public WeeklyScheduleGridAdapter(@NonNull Context context, List<Date> currentWeekDateList, List<Events> eventsList) {
+    public WeeklyScheduleGridAdapter(@NonNull Context context, List<WeeklyEvent> weeklyEventList) {
         super(context, R.layout.single_cell_weekly_schedule);
         mInflater = LayoutInflater.from(context);
-        mCurrentWeekDateList = currentWeekDateList;
-        mEventsList = eventsList;
+        mWeeklyEventList = weeklyEventList;
     }
 
     /**
@@ -75,43 +71,39 @@ public class WeeklyScheduleGridAdapter extends ArrayAdapter {
             position -= 7;
             convertView = mInflater.inflate(R.layout.single_cell_weekly_schedule, parent, false);
 
-            if(position / 7 % 2 == 0){
+            if (position / 7 % 2 == 0) {
                 convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwGold3));
             } else {
                 convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwGold2));
             }
 
+//            Toast.makeText(convertView.getContext(), "" +str
+//                    , Toast.LENGTH_SHORT).show();
 
-            for(int i = 0; i < mEventsList.size(); i++) {
-                Date eventStartDate = Events.convertStringToDate(mEventsList.get(i).getStartDate());
-                Date eventEndDate = Events.convertStringToDate(mEventsList.get(i).getEndDate());
-                String eventStartTime = mEventsList.get(i).getStartTime();
-                String eventEndTime = mEventsList.get(i).getEndTime();
-                int startHour = Integer.parseInt(eventStartTime.split(":")[0]);
-                int startMinute = Integer.parseInt(eventStartTime.split(":")[1]);
-                int endHour = Integer.parseInt(eventEndTime.split(":")[0]);
-                int endMinute = Integer.parseInt(eventEndTime.split(":")[1]);
+            TextView displayEventNameTextView = convertView.findViewById(R.id.tv_display_event_name);
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(eventStartDate);
-                int startDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1; // 0 Sun ~ 6 Sat
-                calendar.setTime(eventEndDate);
-                int endDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+            for (int i = 0; i < mWeeklyEventList.size(); i++) {
+                WeeklyEvent weeklyEvent = mWeeklyEventList.get(i);
+                String startTime = weeklyEvent.getStartTime();
+                String endTime = weeklyEvent.getEndTime();
+                String color = weeklyEvent.getColor();
 
-                if(position % 7 == endDayOfWeek && position / 7 >= startHour && position / 7 < endHour){
-                    convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwGold));
+                int dayOfWeek = Integer.parseInt(weeklyEvent.getDayOfWeek());
+                int startHour = Integer.parseInt(startTime.split(":")[0]);
+                int startMinute = Integer.parseInt(startTime.split(":")[1]);
+                int endHour = Integer.parseInt(endTime.split(":")[0]);
+                int endMinute = Integer.parseInt(endTime.split(":")[1]);
+
+                // highlight the current cell if it is in event time range
+                if(position % 7 == dayOfWeek) {
+                    if(position / 7 >= startHour && position / 7 < endHour){
+                        displayEventNameTextView.setText(weeklyEvent.getEventName());
+                        convertView.setBackgroundColor(Color.parseColor(color));
+                    }
                 }
+
             }
         }
-
-
-//        if(mEventsList.isEmpty()){
-//                    Toast.makeText(convertView.getContext(), "NNOOOOO"
-//                , Toast.LENGTH_SHORT).show();
-//        } else {
-//            Toast.makeText(convertView.getContext(), ""+mEventsList.toString()
-//                    , Toast.LENGTH_SHORT).show();
-//        }
         return convertView;
     }
 

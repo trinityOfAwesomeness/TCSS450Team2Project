@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.Events;
 
 /**
  * Class to display single cell of the calendar.
