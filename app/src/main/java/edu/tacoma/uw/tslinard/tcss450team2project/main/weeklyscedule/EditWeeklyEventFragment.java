@@ -1,12 +1,14 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
 
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -19,33 +21,73 @@ import java.util.Calendar;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
-public class AddWeeklyEventFragment extends Fragment implements View.OnClickListener {
+public class EditWeeklyEventFragment extends Fragment implements View.OnClickListener {
 
-    private AddWeeklyEventListener mAddWeeklyEventListener;
+    private WeeklyEvent mWeeklyEvent;
+    private EditWeeklyEventListener mEditWeeklyEventListener;
 
-    private String mDayOfWeek;
-    private EditText mStartTimeEditText, mEndTimeEditText,
-            mEventNameEditText, mNoteEditText;
+    private Calendar mCalendar;
+    private String mDayOfWeek, mHexColor;
+    private int mHour, mMinute;
+    private EditText mStartTimeEditText, mEndTimeEditText, mEventNameEditText, mNoteEditText;
     private Button mSaveEventButton;
     private SpectrumPalette mColorPalette;
 
-    private int mHour, mMinute;
-    private Calendar mCalendar;
-
-    private String mHexColor;
+    public EditWeeklyEventFragment(WeeklyEvent weeklyEvent) {
+        mWeeklyEvent = weeklyEvent;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAddWeeklyEventListener = (AddWeeklyEventListener) getActivity();
+        mEditWeeklyEventListener = (EditWeeklyEventListener) getActivity();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_weekly_event, container, false);
-        getActivity().setTitle("Add Weekly Event");
+        getActivity().setTitle("Edit Weekly Event");
 
+        int origianl = Integer.parseInt(mWeeklyEvent.getDayOfWeek());
+        RadioButton sunday = view.findViewById(R.id.radio_sunday);
+        RadioButton monday = view.findViewById(R.id.radio_monday);
+        RadioButton tuesday = view.findViewById(R.id.radio_tuesday);
+        RadioButton wednesday = view.findViewById(R.id.radio_wednesday);
+        RadioButton thursday = view.findViewById(R.id.radio_thursday);
+        RadioButton friday = view.findViewById(R.id.radio_friday);
+        RadioButton saturday = view.findViewById(R.id.radio_saturday);
+
+        switch (origianl) {
+            case 0:
+                mDayOfWeek = "0";
+                sunday.setChecked(true);
+                break;
+            case 1:
+                mDayOfWeek = "1";
+                monday.setChecked(true);
+                break;
+            case 2:
+                mDayOfWeek = "2";
+                tuesday.setChecked(true);
+                break;
+            case 3:
+                mDayOfWeek = "3";
+                wednesday.setChecked(true);
+                break;
+            case 4:
+                mDayOfWeek = "4";
+                thursday.setChecked(true);
+                break;
+            case 5:
+                mDayOfWeek = "5";
+                friday.setChecked(true);
+                break;
+            case 6:
+                mDayOfWeek = "6";
+                saturday.setChecked(true);
+                break;
+        }
         // handling day of week radio group
         RadioGroup dayOfWeekRadioGroup = view.findViewById(R.id.rg_day_of_week);
         dayOfWeekRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -74,6 +116,9 @@ public class AddWeeklyEventFragment extends Fragment implements View.OnClickList
                         mDayOfWeek = "6";
                         break;
                 }
+
+//                RadioButton dayOfWeekRadioButton = getView().findViewById(checkedId);
+//                mDayOfWeek = dayOfWeekRadioButton.getText().toString();
             }
         });
 
@@ -84,7 +129,13 @@ public class AddWeeklyEventFragment extends Fragment implements View.OnClickList
         mNoteEditText = view.findViewById(R.id.et_note);
         mSaveEventButton = view.findViewById(R.id.btn_save_event);
 
+        mStartTimeEditText.setText(mWeeklyEvent.getStartTime());
+        mEndTimeEditText.setText(mWeeklyEvent.getEndTime());
+        mEventNameEditText.setText(mWeeklyEvent.getEventName());
+        mHexColor = mWeeklyEvent.getColor();
+        mNoteEditText.setText(mWeeklyEvent.getNote());
 
+        mColorPalette.setSelectedColor(Color.parseColor(mHexColor));
         mColorPalette.setOnColorSelectedListener(new SpectrumPalette.OnColorSelectedListener() {
             @Override
             public void onColorSelected(int color) {
@@ -143,15 +194,20 @@ public class AddWeeklyEventFragment extends Fragment implements View.OnClickList
                 Toast.makeText(getActivity(), "End Time must be greater than the Start Time!"
                         , Toast.LENGTH_SHORT).show();
             } else {
-                WeeklyEvent weeklyEvent = new WeeklyEvent(null, dayOfWeek, startTime, endTime, eventName, color, note);
-                if (mAddWeeklyEventListener != null) {
-                    mAddWeeklyEventListener.addWeeklyEvent(weeklyEvent);
+                mWeeklyEvent.setDayofWeek(dayOfWeek);
+                mWeeklyEvent.setStartTime(startTime);
+                mWeeklyEvent.setEndTime(endTime);
+                mWeeklyEvent.setEventName(eventName);
+                mWeeklyEvent.setColor(color);
+                mWeeklyEvent.setNote(note);
+                if (mEditWeeklyEventListener != null) {
+                    mEditWeeklyEventListener.editWeeklyEvent(mWeeklyEvent);
                 }
             }
         }
     }
 
-    public interface AddWeeklyEventListener {
-        void addWeeklyEvent(WeeklyEvent weeklyEvent);
+    public interface EditWeeklyEventListener {
+        void editWeeklyEvent(WeeklyEvent weeklyEvent);
     }
 }

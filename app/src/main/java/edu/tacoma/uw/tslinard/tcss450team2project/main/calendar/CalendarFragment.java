@@ -126,10 +126,11 @@ public class CalendarFragment extends Fragment {
 
     /**
      * Opens up the dialog and display list of events using recycle view.
-     * @param view - the fragment's view
+     *
+     * @param view         - the fragment's view
      * @param selectedDate - the selected date to show events
      */
-    private void openEventDialog(View view, Date selectedDate){
+    private void openEventDialog(View view, Date selectedDate) {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_events, null);

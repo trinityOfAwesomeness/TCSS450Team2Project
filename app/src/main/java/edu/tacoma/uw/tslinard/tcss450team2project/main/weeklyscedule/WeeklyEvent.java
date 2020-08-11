@@ -38,6 +38,30 @@ public class WeeklyEvent {
         mNote = note;
     }
 
+    public void setDayofWeek(String dayOfWeek) {
+        mDayofWeek = dayOfWeek;
+    }
+
+    public void setStartTime(String startTime) {
+        mStartTime = startTime;
+    }
+
+    public void setEndTime(String endTime) {
+        mEndTime = endTime;
+    }
+
+    public void setEventName(String eventName) {
+        mEventName = eventName;
+    }
+
+    public void setColor(String color) {
+        mColor = color;
+    }
+
+    public void setNote(String note) {
+        mNote = note;
+    }
+
     public String getEventId() {
         return mEventId;
     }
@@ -87,9 +111,5 @@ public class WeeklyEvent {
             }
         }
         return weeklyEventList;
-    }
-
-    public String toString() {
-        return mEventId + " " + mDayofWeek + " " + mStartTime + " " + mEventName + " " + mColor;
     }
 }

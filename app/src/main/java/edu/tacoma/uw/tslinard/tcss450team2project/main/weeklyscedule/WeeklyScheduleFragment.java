@@ -1,6 +1,8 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,7 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -26,6 +29,9 @@ import edu.tacoma.uw.tslinard.tcss450team2project.R;
  * @author Tatiana Linardopoulou
  */
 public class WeeklyScheduleFragment extends Fragment {
+
+    private DeleteWeeklyEventListener mDeleteWeeklyEventListener;
+
     private AlertDialog mAlertDialog;
     private View mView;
     private GridView mGridView;
@@ -42,6 +48,7 @@ public class WeeklyScheduleFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mWeeklyEventList = new ArrayList<>();
         setHasOptionsMenu(true);
+        mDeleteWeeklyEventListener = (DeleteWeeklyEventListener) getActivity();
     }
 
     /**
@@ -66,43 +73,87 @@ public class WeeklyScheduleFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 position -= 7;
-                Toast.makeText(getActivity(), "Position: " + position
-                        , Toast.LENGTH_SHORT).show();
+
+                for (int i = 0; i < mWeeklyEventList.size(); i++) {
+                    WeeklyEvent weeklyEvent = mWeeklyEventList.get(i);
+                    String startTime = weeklyEvent.getStartTime();
+                    String endTime = weeklyEvent.getEndTime();
+                    String color = weeklyEvent.getColor();
+
+                    int dayOfWeek = Integer.parseInt(weeklyEvent.getDayOfWeek());
+                    int startHour = Integer.parseInt(startTime.split(":")[0]);
+                    int startMinute = Integer.parseInt(startTime.split(":")[1]);
+                    int endHour = Integer.parseInt(endTime.split(":")[0]);
+                    int endMinute = Integer.parseInt(endTime.split(":")[1]);
+
+                    // highlight the current cell if it is in event time range
+                    if(position % 7 == dayOfWeek) {
+                        if(position / 7 >= startHour && position / 7 < endHour){
+//                            Toast.makeText(getActivity(), "Position: " + position + "\n" + mWeeklyEventList.toString()
+//                                    , Toast.LENGTH_SHORT).show();
+                            openEventDialog(view, weeklyEvent);
+                        }
+                    }
+
+                }
             }
         });
 
         return mView;
     }
-//
-//    /**
-//     * Opens up the dialog and display list of events using recycle view.
-//     * @param view - the fragment's view
-//     * @param selectedDate - the selected date to show events
-//     */
-//    private void openEventDialog(View view, Date selectedDate){
-//        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-//        LayoutInflater inflater = getActivity().getLayoutInflater();
-//        View dialogView = inflater.inflate(R.layout.dialog_events, null);
-//
-//        // set recycler view
-//        RecyclerView recyclerView = dialogView.findViewById(R.id.events_recycle_view);
-//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(dialogView.getContext());
-//        recyclerView.setLayoutManager(layoutManager);
-//        String stringDate = mDateFormat.format(selectedDate);
-//        builder.setView(dialogView)
-//                .setTitle("Events on " + stringDate)
-//                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                    }
-//                });
-//        mAlertDialog = builder.create();
-//        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(this,
-//                mAlertDialog, collectEventsByDate(selectedDate));
-//        eventRecyclerAdapter.notifyDataSetChanged();
-//        recyclerView.setAdapter(eventRecyclerAdapter);
-//        mAlertDialog.show();
-//    }
+
+    /**
+     * Opens up the dialog and display list of events using recycle view.
+     * @param view - the fragment's view
+     */
+    private void openEventDialog(View view, final WeeklyEvent weeklyEvent){
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_weekly_event, null);
+
+        dialogView.setBackgroundColor(Color.parseColor(weeklyEvent.getColor()));
+
+        TextView eventNameTextView = dialogView.findViewById(R.id.tv_display_event_name);
+        TextView noteTextView = dialogView.findViewById(R.id.tv_display_note);
+        TextView startTimeTextView = dialogView.findViewById(R.id.tv_display_event_start_time);
+        TextView endTimeTextView = dialogView.findViewById(R.id.tv_display_event_end_time);
+        ImageView deleteImageView = dialogView.findViewById(R.id.iv_delete);
+        ImageView editImageView = dialogView.findViewById(R.id.iv_edit);
+
+        eventNameTextView.setText(weeklyEvent.getEventName());
+        noteTextView.setText(weeklyEvent.getNote());
+        startTimeTextView.setText("Start time: " + weeklyEvent.getStartTime());
+        endTimeTextView.setText("End time: " + weeklyEvent.getEndTime());
+
+        deleteImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mDeleteWeeklyEventListener != null) {
+                    mDeleteWeeklyEventListener.deleteWeeklyEvent(weeklyEvent.getEventId());
+                    mAlertDialog.dismiss();
+                }
+            }
+        });
+        editImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAlertDialog.dismiss();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new EditWeeklyEventFragment(weeklyEvent))
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+        builder.setView(dialogView)
+                .setTitle(weeklyEvent.getEventName())
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -124,8 +175,6 @@ public class WeeklyScheduleFragment extends Fragment {
     }
 
     private void updateWeeklySchedule() {
-        Toast.makeText(getActivity(), "Weekly Events: " + mWeeklyEventList.toString()
-                , Toast.LENGTH_SHORT).show();
         mWeeklyScheduleGridAdapter = new WeeklyScheduleGridAdapter(mView.getContext(), mWeeklyEventList);
         mGridView.setAdapter(mWeeklyScheduleGridAdapter);
     }
@@ -137,5 +186,9 @@ public class WeeklyScheduleFragment extends Fragment {
 
     public interface GetWeeklyEventsListener {
         void getWeeklyEvents();
+    }
+
+    public interface DeleteWeeklyEventListener {
+        void deleteWeeklyEvent(String eventId);
     }
 }

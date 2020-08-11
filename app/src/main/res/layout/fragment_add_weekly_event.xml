@@ -212,15 +212,26 @@
                 android:textColor="@android:color/black" />
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/btn_color"
+<!--        <Button-->
+<!--            android:id="@+id/btn_color"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="260dp"-->
+<!--            android:text="OPEN COLOR PICKER"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" -->
+<!--            />-->
+        <com.thebluealliance.spectrum.SpectrumPalette
+            android:id="@+id/palette_color"
+            android:layout_marginTop="260dp"
+            android:layout_marginBottom="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="260dp"
-            android:text="OPEN COLOR PICKER"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:spectrum_colors="@array/demo_colors"/>
 
         <RelativeLayout
             android:id="@+id/note"
@@ -230,7 +241,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_color">
+            app:layout_constraintTop_toBottomOf="@+id/palette_color">
 
             <EditText
                 android:id="@+id/et_note"
