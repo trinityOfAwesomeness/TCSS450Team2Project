@@ -17,4 +17,6 @@
     <string name = "get_tasks">https://tslinard-calendarapp-backend.herokuapp.com/tasks</string>
     <string name = "edit_task">https://tslinard-calendarapp-backend.herokuapp.com/edittask</string>
     <string name = "delete_task">https://tslinard-calendarapp-backend.herokuapp.com/deletetask</string>
+
+    <string name = "reset_password">https://tslinard-calendarapp-backend.herokuapp.com/resetpw</string>
 </resources>
