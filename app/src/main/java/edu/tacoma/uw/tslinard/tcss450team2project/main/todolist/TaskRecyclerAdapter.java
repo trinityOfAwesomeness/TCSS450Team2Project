@@ -15,7 +15,15 @@ import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
+/**
+ * Class to set and display list of tasks into recycler view.
+ * It is an adapter class which connects the data with the view.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
+ */
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.TaskViewHolder> {
+
     private DeleteTaskListener mDeleteTaskListener;
     private Fragment mFragment;
     private List<Task> mTaskList;
@@ -26,6 +34,14 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         mDeleteTaskListener = (DeleteTaskListener) mFragment.getActivity();
     }
 
+    /**
+     * Creates view holder for a task in recycler view.
+     *
+     * @param parent   - The ViewGroup into which the new View will be added after it is bound to an adapter position.
+     * @param viewType - The view type of the new View.
+     * @return - ViewHolder used to display tasks of the adapter
+     */
+    @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View viw = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_to_do_list, parent, false);
@@ -33,11 +49,18 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         return holder;
     }
 
+    /**
+     * Called by RecyclerView to display a task at the specified position.
+     *
+     * @param holder   - The ViewHolder which should be updated to represent
+     *                 the task at the given position in the data set.
+     * @param position - The position of the task within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
         final Task currentTask = mTaskList.get(position);
         holder.mTaskTextView.setText(currentTask.getTask());
-        if(currentTask.getStatus() == "false"){
+        if(currentTask.getStatus().equals("false")){
             holder.mStatusTextView.setText("STARTED");
         } else {
             holder.mStatusTextView.setTextColor(Color.parseColor("#34c759"));
@@ -63,15 +86,32 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         holder.itemView.setTag(position);
 
     }
+
+    /**
+     * Returns the total number of tasks in the data set held by the adapter.
+     *
+     * @return - number of tasks
+     */
     @Override
     public int getItemCount() {
         return mTaskList.size();
     }
 
+    /**
+     * Interface for deleting a task.
+     */
     public interface DeleteTaskListener {
+        /**
+         * Deleting a task through posting the task id to the web service.
+         *
+         * @param toDoId - task's id
+         */
         void deleteTask(String toDoId);
     }
 
+    /**
+     * Class to describe an item view and metadata about its place within the RecyclerView.
+     */
     public class TaskViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTaskTextView, mStatusTextView;
         protected ImageView mDeleteImageView, mEditImageView;

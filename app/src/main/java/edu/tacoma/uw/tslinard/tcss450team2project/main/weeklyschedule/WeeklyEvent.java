@@ -1,4 +1,4 @@
-package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
+package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyschedule;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -7,6 +7,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Weekly Event class for weekly schedule.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
+ */
 public class WeeklyEvent {
 
     // Properties of Json object. Used to GET/POST events.
@@ -38,30 +44,6 @@ public class WeeklyEvent {
         mNote = note;
     }
 
-    public void setDayofWeek(String dayOfWeek) {
-        mDayofWeek = dayOfWeek;
-    }
-
-    public void setStartTime(String startTime) {
-        mStartTime = startTime;
-    }
-
-    public void setEndTime(String endTime) {
-        mEndTime = endTime;
-    }
-
-    public void setEventName(String eventName) {
-        mEventName = eventName;
-    }
-
-    public void setColor(String color) {
-        mColor = color;
-    }
-
-    public void setNote(String note) {
-        mNote = note;
-    }
-
     public String getEventId() {
         return mEventId;
     }
@@ -90,11 +72,35 @@ public class WeeklyEvent {
         return mNote;
     }
 
+    public void setDayOfWeek(String dayOfWeek) {
+        mDayofWeek = dayOfWeek;
+    }
+
+    public void setStartTime(String startTime) {
+        mStartTime = startTime;
+    }
+
+    public void setEndTime(String endTime) {
+        mEndTime = endTime;
+    }
+
+    public void setEventName(String eventName) {
+        mEventName = eventName;
+    }
+
+    public void setColor(String color) {
+        mColor = color;
+    }
+
+    public void setNote(String note) {
+        mNote = note;
+    }
+
     /**
-     * Parse Json format and retrieve list of events.
+     * Parse Json format and retrieve list of weekly events.
      *
      * @param weeklyEventsJson - string in Json format
-     * @return - list of events retrieved from Json format
+     * @return - list of weekly events retrieved from Json format
      * @throws JSONException - if input string is not in Json format
      */
     public static List<WeeklyEvent> parseWeeklyEventJson(String weeklyEventsJson) throws JSONException {

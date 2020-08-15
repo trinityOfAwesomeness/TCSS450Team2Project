@@ -1,5 +1,6 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.todolist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,24 +20,20 @@ import java.util.Comparator;
 import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
-import edu.tacoma.uw.tslinard.tcss450team2project.main.calendar.Events;
 
 /**
  * Class to create and control the To Do List page.
+ *
  * @author Seoungdeok Jeon
  * @author Tatiana Linardopoulou
  */
 public class ToDoListFragment extends Fragment {
 
     private List<Task> mTaskList;
-    private View mView;
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
 
     /**
-     * Called to do initial creation of CalendarFragment.
+     * Called to do initial creation of ToDoListFragment.
      *
      * @param savedInstanceState - If the fragment is being re-created from a previous saved state, this is the state.
      */
@@ -55,7 +52,7 @@ public class ToDoListFragment extends Fragment {
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.to_do_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -68,12 +65,31 @@ public class ToDoListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        // Launches AddEventFragment if create_event_item is selected
+        // Launches AddTaskFragment if create_event_item is selected
         if (id == R.id.add_item) {
             getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new AddTaskFragment())
                     .addToBackStack(null)
                     .commit();
+        } else if(id == R.id.share_item) {
+            Intent myIntent = new Intent(Intent.ACTION_SEND);
+            myIntent.setType("text/plain");
+            String shareSubject = "TO DO LIST";
+            StringBuilder shareBody = new StringBuilder();
+            int i = 1;
+            for(Task task: mTaskList) {
+                shareBody.append("Task " + i + ": " + task.getTask() + " & ");
+                if(task.getStatus().equals("false")){
+                    shareBody.append("Status: STARTED");
+                } else {
+                    shareBody.append("Status: COMPLETED");
+                }
+                shareBody.append("\n");
+                i++;
+            }
+            myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject);
+            myIntent.putExtra(Intent.EXTRA_TEXT, shareBody.toString());
+            startActivity(Intent.createChooser(myIntent, "Share using"));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -90,29 +106,22 @@ public class ToDoListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_to_do_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_to_do_list, container, false);
         getActivity().setTitle("To Do List");
-
-        mRecyclerView = mView.findViewById(R.id.rv_to_do_list);
-
+        mRecyclerView = view.findViewById(R.id.rv_to_do_list);
         updateToDoList();
-
-
-//        mToDoListRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                Toast.makeText(getContext(), "Clicked" + position, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-        return mView;
+        return view;
     }
 
+    /**
+     * Sets up to do list page with the tasks.
+     */
     private void updateToDoList() {
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new TaskRecyclerAdapter(this, mTaskList);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        TaskRecyclerAdapter adapter = new TaskRecyclerAdapter(this, mTaskList);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setAdapter(adapter);
 
         // sort tasks by creation order
         Collections.sort(mTaskList, new Comparator() {
@@ -124,13 +133,24 @@ public class ToDoListFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Sets up task list.
+     *
+     * @param taskList - list of tasks to be set
+     */
     public void setTaskList(List<Task> taskList) {
         mTaskList = taskList;
-//        Toast.makeText(getActivity(), ""+mTaskList.toString(), Toast.LENGTH_SHORT).show();
         updateToDoList();
     }
 
+    /**
+     * Interface for getting tasks.
+     */
     public interface GetTasksListener {
+        /**
+         * Retrieve tasks from the web service.
+         */
         void getTasks();
     }
 }

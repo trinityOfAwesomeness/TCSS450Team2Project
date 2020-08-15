@@ -1,7 +1,5 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.main.calendar;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,14 +13,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -40,14 +34,10 @@ public class CalendarFragment extends Fragment {
     private static final int MAX_CALENDAR_DAYS = 42;
 
     private View mView;
-    private ImageButton mNextMonthImageButton;
-    private ImageButton mPreviousMonthImageButton;
     private TextView mCurrentDateTextView;
     private GridView mGridView;
-    private CalendarGridAdapter mCalendarGridAdapter;
-    private AlertDialog mAlertDialog;
     private List<Date> mPageDates;
-    private List<Events> mEventsList;
+    private List<MonthlyEvent> mMonthlyEventList;
     private Calendar mMainCalendar;
     private SimpleDateFormat mMonthYearFormat;
     private SimpleDateFormat mDateFormat;
@@ -64,7 +54,7 @@ public class CalendarFragment extends Fragment {
         mMonthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
         mDateFormat = new SimpleDateFormat("M/d/yyyy", Locale.ENGLISH);
         mPageDates = new ArrayList<>();
-        mEventsList = new ArrayList<>();
+        mMonthlyEventList = new ArrayList<>();
         setHasOptionsMenu(true);
     }
 
@@ -82,16 +72,17 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_calendar, container, false);
         getActivity().setTitle("Calendar");
-        mNextMonthImageButton = mView.findViewById(R.id.ib_next);
-        mPreviousMonthImageButton = mView.findViewById(R.id.ib_previous);
         mCurrentDateTextView = mView.findViewById(R.id.tv_current_Date);
         mGridView = mView.findViewById(R.id.calendar_grid_view);
+
+        ImageButton nextMonthImageButton = mView.findViewById(R.id.ib_next);
+        ImageButton previousMonthImageButton = mView.findViewById(R.id.ib_previous);
 
         // Update the calendar with current month's dates when this fragment is initialized
         updateCalendar();
 
         // Update the calendar with last month's dates
-        mPreviousMonthImageButton.setOnClickListener(new View.OnClickListener() {
+        previousMonthImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mMainCalendar.add(Calendar.MONTH, -1);
@@ -100,7 +91,7 @@ public class CalendarFragment extends Fragment {
         });
 
         // Update the calendar with next month's dates
-        mNextMonthImageButton.setOnClickListener(new View.OnClickListener() {
+        nextMonthImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mMainCalendar.add(Calendar.MONTH, 1);
@@ -115,44 +106,15 @@ public class CalendarFragment extends Fragment {
                 if (position >= 7) {
                     Date selectedDate = mPageDates.get(position - 7);
                     if (!collectEventsByDate(selectedDate).isEmpty()) {
-                        openEventDialog(view, selectedDate);
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new DisplayMonthlyEventsFragment(collectEventsByDate(selectedDate)))
+                                .addToBackStack(null)
+                                .commit();
                     }
                 }
             }
         });
-
         return mView;
-    }
-
-    /**
-     * Opens up the dialog and display list of events using recycle view.
-     *
-     * @param view         - the fragment's view
-     * @param selectedDate - the selected date to show events
-     */
-    private void openEventDialog(View view, Date selectedDate) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_events, null);
-
-        // set recycler view
-        RecyclerView recyclerView = dialogView.findViewById(R.id.events_recycle_view);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(dialogView.getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        String stringDate = mDateFormat.format(selectedDate);
-        builder.setView(dialogView)
-                .setTitle("Events on " + stringDate)
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                    }
-                });
-        mAlertDialog = builder.create();
-        EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(this,
-                mAlertDialog, collectEventsByDate(selectedDate));
-        eventRecyclerAdapter.notifyDataSetChanged();
-        recyclerView.setAdapter(eventRecyclerAdapter);
-        mAlertDialog.show();
     }
 
     /**
@@ -176,10 +138,10 @@ public class CalendarFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        // Launches AddEventFragment if create_event_item is selected
+        // Launches AddMonthlyEventFragment if create_event_item is selected
         if (id == R.id.add_item) {
             getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AddEventFragment())
+                    .replace(R.id.fragment_container, new AddMonthlyEventFragment())
                     .addToBackStack(null)
                     .commit();
         }
@@ -192,13 +154,13 @@ public class CalendarFragment extends Fragment {
      * @param date - the specific date to collect events
      * @return - list of events corresponding to the input date.
      */
-    private ArrayList<Events> collectEventsByDate(Date date) {
+    private ArrayList<MonthlyEvent> collectEventsByDate(Date date) {
         String selectedDate = mDateFormat.format(date);
-        ArrayList<Events> selectedDateEvents = new ArrayList<>();
-        for (int i = 0; i < mEventsList.size(); i++) {
-            String compareDate = mEventsList.get(i).getEndDate();
+        ArrayList<MonthlyEvent> selectedDateEvents = new ArrayList<>();
+        for (int i = 0; i < mMonthlyEventList.size(); i++) {
+            String compareDate = mMonthlyEventList.get(i).getEndDate();
             if (selectedDate.equals(compareDate)) {
-                selectedDateEvents.add(mEventsList.get(i));
+                selectedDateEvents.add(mMonthlyEventList.get(i));
             }
         }
         return selectedDateEvents;
@@ -226,36 +188,26 @@ public class CalendarFragment extends Fragment {
             pageCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        mCalendarGridAdapter = new CalendarGridAdapter(mView.getContext(), mPageDates, mMainCalendar, mEventsList);
-        mGridView.setAdapter(mCalendarGridAdapter);
-
-        // sort monthly events by creation order
-        Collections.sort(mEventsList, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                Events event1 = (Events) o1;
-                Events event2 = (Events) o2;
-                return event1.getEventId().compareTo(event2.getEventId());
-            }
-        });
+        CalendarGridAdapter calendarGridAdapter = new CalendarGridAdapter(mView.getContext(), mPageDates, mMainCalendar, mMonthlyEventList);
+        mGridView.setAdapter(calendarGridAdapter);
     }
 
     /**
-     * Sets up list of events.
+     * Sets up monthly event list.
      *
-     * @param events - list of events to be set
+     * @param monthlyEventList - list of monthly events to be set
      */
-    public void setEventsList(List<Events> events) {
-        mEventsList = events;
+    public void setMonthlyEventList(List<MonthlyEvent> monthlyEventList) {
+        mMonthlyEventList = monthlyEventList;
         updateCalendar();
     }
 
     /**
-     * Interface for getting events.
+     * Interface for getting monthly events.
      */
     public interface GetMonthlyEventsListener {
         /**
-         * Retrieve events from the web service.
+         * Retrieve monthly events from the web service.
          */
         void getMonthlyEvents();
     }

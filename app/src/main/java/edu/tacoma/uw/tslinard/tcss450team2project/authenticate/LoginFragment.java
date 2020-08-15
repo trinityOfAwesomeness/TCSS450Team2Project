@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -48,9 +48,10 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-        getActivity().setTitle("HuskyCal");
+        getActivity().setTitle("Sign In");
         final EditText emailEditText = view.findViewById(R.id.et_email);
         final EditText passwordEditText = view.findViewById(R.id.et_password);
+        final TextView errorTextView = view.findViewById(R.id.tv_error);
         Button loginButton = view.findViewById(R.id.btn_login);
         // Login if loginButton is clicked
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -59,13 +60,14 @@ public class LoginFragment extends Fragment {
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 if (TextUtils.isEmpty(email) || !email.contains("@")) {
-                    Toast.makeText(v.getContext(), "Enter valid email address", Toast.LENGTH_SHORT).show();
+                    errorTextView.setText("Enter valid email address.");
                     emailEditText.requestFocus();
                 } else {
                     mLoginListener.login(email, password);
                 }
             }
         });
+
         // Launch SignUpFragment if createAccountButton is clicked
         Button createAccountButton = view.findViewById(R.id.btn_create_account);
         createAccountButton.setOnClickListener(new View.OnClickListener() {

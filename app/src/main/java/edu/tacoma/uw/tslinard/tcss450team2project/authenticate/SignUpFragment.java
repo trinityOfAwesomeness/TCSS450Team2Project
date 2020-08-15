@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -62,9 +63,13 @@ public class SignUpFragment extends Fragment {
                 String userName = uerNameEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                Account account = new Account(firstName, lastName, userName, email, password);
-                if (mSignUpListener != null) {
-                    mSignUpListener.singUp(account);
+                try{
+                    Account account = new Account(firstName, lastName, userName, email, password);
+                    if (mSignUpListener != null) {
+                        mSignUpListener.singUp(account);
+                    }
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(getActivity(), "Enter a valid email.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

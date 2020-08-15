@@ -1,10 +1,12 @@
 package edu.tacoma.uw.tslinard.tcss450team2project.authenticate;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -210,6 +212,14 @@ public class SignInActivity extends AppCompatActivity
                     }
                 } else {
                     if (jsonObject.getBoolean("success")) {
+                        //Initialize Progress Dialog
+                        ProgressDialog progressDialog = new ProgressDialog(SignInActivity.this);
+                        progressDialog.show();
+                        progressDialog.setContentView(R.layout.dialog_progress);
+                        //Set Transparent Background
+                        progressDialog.getWindow().setBackgroundDrawableResource(
+                                android.R.color.transparent
+                        );
                         Toast.makeText(getApplicationContext(), "Logged in successfully"
                                 , Toast.LENGTH_SHORT).show();
                         launchMain();
@@ -220,6 +230,8 @@ public class SignInActivity extends AppCompatActivity
                     }
                 }
             } catch (JSONException e) {
+                final TextView errorTextView = findViewById(R.id.tv_error);
+                errorTextView.setText("That account doesn't exist. Enter a different account.");
                 Toast.makeText(getApplicationContext(), "JSON Parsing error: "
                                 + e.getMessage()
                         , Toast.LENGTH_LONG).show();

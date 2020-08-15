@@ -12,9 +12,12 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Events class for calendar and weekly schedule.
+ * Monthly Event class for calendar.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
  */
-public class Events {
+public class MonthlyEvent {
 
     // Properties of Json object. Used to GET/POST events.
     public static final String EVENT_ID = "eventid";
@@ -34,7 +37,7 @@ public class Events {
     private String mEventName;
     private String mNote;
 
-    public Events(String eventId, String startDate, String startTime, String endDate, String endTime, String eventName, String note){
+    public MonthlyEvent(String eventId, String startDate, String startTime, String endDate, String endTime, String eventName, String note){
         mEventId = eventId;
         mStartDate = startDate;
         mStartTime = startTime;
@@ -98,25 +101,26 @@ public class Events {
     }
 
     /**
-     * Parse Json format and retrieve list of events.
-     * @param eventsJson - string in Json format
-     * @return - list of events retrieved from Json format
+     * Parse Json format and retrieve list of monthly events.
+     *
+     * @param monthlyEventJson - string in Json format
+     * @return - list of monthly events retrieved from Json format
      * @throws JSONException - if input string is not in Json format
      */
-    public static List<Events> parseEventsJson(String eventsJson) throws JSONException {
-        List<Events> eventsList = new ArrayList<>();
-        if(eventsJson != null){
-            JSONArray arr = new JSONArray(eventsJson);
+    public static List<MonthlyEvent> parseMonthlyEventsJson(String monthlyEventJson) throws JSONException {
+        List<MonthlyEvent> monthlyEventList = new ArrayList<>();
+        if(monthlyEventJson != null){
+            JSONArray arr = new JSONArray(monthlyEventJson);
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
-                Events event = new Events(obj.getString(Events.EVENT_ID),
-                        obj.getString(Events.START_DATE), obj.getString(Events.START_TIME),
-                        obj.getString(Events.END_DATE), obj.getString(Events.END_TIME),
-                        obj.getString(Events.EVENT_NAME), obj.getString(Events.NOTE));
-                eventsList.add(event);
+                MonthlyEvent monthlyEvent = new MonthlyEvent(obj.getString(MonthlyEvent.EVENT_ID),
+                        obj.getString(MonthlyEvent.START_DATE), obj.getString(MonthlyEvent.START_TIME),
+                        obj.getString(MonthlyEvent.END_DATE), obj.getString(MonthlyEvent.END_TIME),
+                        obj.getString(MonthlyEvent.EVENT_NAME), obj.getString(MonthlyEvent.NOTE));
+                monthlyEventList.add(monthlyEvent);
             }
         }
-        return eventsList;
+        return monthlyEventList;
     }
 
     /**
@@ -134,9 +138,5 @@ public class Events {
             e.printStackTrace();
         }
         return date;
-    }
-
-    public String toString(){
-        return mEndDate;
     }
 }

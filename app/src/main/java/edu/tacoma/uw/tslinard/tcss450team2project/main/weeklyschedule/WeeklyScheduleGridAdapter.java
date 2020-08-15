@@ -1,4 +1,4 @@
-package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
+package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyschedule;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,6 +15,13 @@ import java.util.List;
 
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
+/**
+ * Class to display single cell of the weekly schedule.
+ * It is an adapter class which connects the data and the view.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
+ */
 public class WeeklyScheduleGridAdapter extends ArrayAdapter {
     private LayoutInflater mInflater;
     private List<WeeklyEvent> mWeeklyEventList;
@@ -26,7 +33,7 @@ public class WeeklyScheduleGridAdapter extends ArrayAdapter {
     }
 
     /**
-     * Get a View that displays the day of month at the specified position in the Calendar.
+     * Get a View that displays the time cell at the specified position in the Weekly Schedule.
      *
      * @param position    - the position of the grid cell
      * @param convertView - view that inflate single cell layout
@@ -62,7 +69,6 @@ public class WeeklyScheduleGridAdapter extends ArrayAdapter {
                     dayOfWeek = "Sat";
                     break;
             }
-
             convertView = mInflater.inflate(R.layout.single_cell_weekly_schedule_dayofweek, parent, false);
             convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwPurple));
             TextView dayOfWeekTextView = convertView.findViewById(R.id.tv_weekly_schedule_dayofweek);
@@ -71,14 +77,12 @@ public class WeeklyScheduleGridAdapter extends ArrayAdapter {
             position -= 7;
             convertView = mInflater.inflate(R.layout.single_cell_weekly_schedule, parent, false);
 
+            // converting color of the cell based on it's position
             if (position / 7 % 2 == 0) {
                 convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwGold3));
             } else {
                 convertView.setBackgroundColor(getContext().getResources().getColor(R.color.uwGold2));
             }
-
-//            Toast.makeText(convertView.getContext(), "" +str
-//                    , Toast.LENGTH_SHORT).show();
 
             TextView displayEventNameTextView = convertView.findViewById(R.id.tv_display_event_name);
 
@@ -94,7 +98,7 @@ public class WeeklyScheduleGridAdapter extends ArrayAdapter {
                 int endHour = Integer.parseInt(endTime.split(":")[0]);
                 int endMinute = Integer.parseInt(endTime.split(":")[1]);
 
-                // highlight the current cell if it is in event time range
+                // highlight the current cell if it is in the event time range
                 if(position % 7 == dayOfWeek) {
                     if(position / 7 >= startHour && position / 7 < endHour){
                         displayEventNameTextView.setText(weeklyEvent.getEventName());

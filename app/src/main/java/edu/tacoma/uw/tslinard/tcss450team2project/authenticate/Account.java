@@ -72,7 +72,7 @@ public class Account implements Serializable {
     /**
      * Validates if the given input is a valid email address.
      *
-     * @param email        The email to validate.
+     * @param email The email to validate.
      * @return {@code true} if the input is a valid email. {@code false} otherwise.
      */
     public static boolean isValidEmail(String email) {

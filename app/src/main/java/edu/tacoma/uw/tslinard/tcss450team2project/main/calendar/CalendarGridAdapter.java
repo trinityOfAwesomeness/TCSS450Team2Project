@@ -21,19 +21,22 @@ import edu.tacoma.uw.tslinard.tcss450team2project.R;
 /**
  * Class to display single cell of the calendar.
  * It is an adapter class which connects the data and the view.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
  */
 public class CalendarGridAdapter extends ArrayAdapter {
 
     private List<Date> mPageDates;
     private Calendar mCurrentDate;
-    private List<Events> mEventsList;
+    private List<MonthlyEvent> mMonthlyEventList;
     private LayoutInflater mInflater;
 
-    public CalendarGridAdapter(@NonNull Context context, List<Date> pageDates, Calendar currentDate, List<Events> events) {
+    public CalendarGridAdapter(@NonNull Context context, List<Date> pageDates, Calendar currentDate, List<MonthlyEvent> monthlyEventList) {
         super(context, R.layout.single_cell_calendar);
         mPageDates = pageDates;
         mCurrentDate = currentDate;
-        mEventsList = events;
+        mMonthlyEventList = monthlyEventList;
         mInflater = LayoutInflater.from(context);
     }
 
@@ -118,13 +121,13 @@ public class CalendarGridAdapter extends ArrayAdapter {
 
             // display number of events of the day in the calendar
             Calendar eventCalendar = Calendar.getInstance();
-            ArrayList<Events> currentDateEvents = new ArrayList<>();
-            for (int i = 0; i < mEventsList.size(); i++) {
-                Date date = Events.convertStringToDate(mEventsList.get(i).getEndDate());
+            ArrayList<MonthlyEvent> currentDateEvents = new ArrayList<>();
+            for (int i = 0; i < mMonthlyEventList.size(); i++) {
+                Date date = MonthlyEvent.convertStringToDate(mMonthlyEventList.get(i).getEndDate());
                 eventCalendar.setTime(date);
                 if (displayDay == eventCalendar.get(Calendar.DAY_OF_MONTH) && displayMonth == eventCalendar.get(Calendar.MONTH) + 1
                         && displayYear == eventCalendar.get(Calendar.YEAR)) {
-                    currentDateEvents.add(mEventsList.get(i));
+                    currentDateEvents.add(mMonthlyEventList.get(i));
                     numberOfEventsTextView.setText(currentDateEvents.size() + " Events");
                 }
             }
@@ -139,8 +142,6 @@ public class CalendarGridAdapter extends ArrayAdapter {
      */
     @Override
     public int getCount() {
-        return mPageDates.size() + 7; //49
+        return mPageDates.size() + 7;
     }
-
-
 }

@@ -20,8 +20,13 @@
 
 
     <!-- It will trigger action but will not stay selected-->
+
     <item android:title="Action">
         <menu>
+            <item
+                android:id="@+id/nav_rest_password"
+                android:icon="@drawable/ic_reset_password"
+                android:title="@string/action_rest_password" />
             <item
                 android:id="@+id/nav_signout"
                 android:icon="@drawable/ic_sign_out"

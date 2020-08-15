@@ -1,7 +1,6 @@
-package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyscedule;
+package edu.tacoma.uw.tslinard.tcss450team2project.main.weeklyschedule;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,18 +24,17 @@ import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
 /**
  * Class to create and control the Weekly Schedule page.
+ *
  * @author Seoungdeok Jeon
  * @author Tatiana Linardopoulou
  */
 public class WeeklyScheduleFragment extends Fragment {
 
     private DeleteWeeklyEventListener mDeleteWeeklyEventListener;
-
     private AlertDialog mAlertDialog;
     private View mView;
     private GridView mGridView;
     private List<WeeklyEvent> mWeeklyEventList;
-    private WeeklyScheduleGridAdapter mWeeklyScheduleGridAdapter;
 
     /**
      * Called to do initial creation of WeeklyScheduleFragment.
@@ -78,7 +76,6 @@ public class WeeklyScheduleFragment extends Fragment {
                     WeeklyEvent weeklyEvent = mWeeklyEventList.get(i);
                     String startTime = weeklyEvent.getStartTime();
                     String endTime = weeklyEvent.getEndTime();
-                    String color = weeklyEvent.getColor();
 
                     int dayOfWeek = Integer.parseInt(weeklyEvent.getDayOfWeek());
                     int startHour = Integer.parseInt(startTime.split(":")[0]);
@@ -86,11 +83,9 @@ public class WeeklyScheduleFragment extends Fragment {
                     int endHour = Integer.parseInt(endTime.split(":")[0]);
                     int endMinute = Integer.parseInt(endTime.split(":")[1]);
 
-                    // highlight the current cell if it is in event time range
+                    // highlight the current cell if it is in the event's time range
                     if(position % 7 == dayOfWeek) {
                         if(position / 7 >= startHour && position / 7 < endHour){
-//                            Toast.makeText(getActivity(), "Position: " + position + "\n" + mWeeklyEventList.toString()
-//                                    , Toast.LENGTH_SHORT).show();
                             openEventDialog(view, weeklyEvent);
                         }
                     }
@@ -103,27 +98,54 @@ public class WeeklyScheduleFragment extends Fragment {
     }
 
     /**
-     * Opens up the dialog and display list of events using recycle view.
+     * Create the options menu when the user opens the menu for the first time.
+     *
+     * @param menu     - menu container
+     * @param inflater - The MenuInflater object that can be used to inflate views in the menu.
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * When the user selects an item from the options menu, the system calls this method.
+     *
+     * @param item - the MenuItem selected.
+     * @return - the boolean for checking if an item is selected or not
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.add_item) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new AddWeeklyEventFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Opens up the dialog and display list of weekly events using recycle view.
      * @param view - the fragment's view
      */
     private void openEventDialog(View view, final WeeklyEvent weeklyEvent){
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_weekly_event, null);
-
         dialogView.setBackgroundColor(Color.parseColor(weeklyEvent.getColor()));
 
         TextView eventNameTextView = dialogView.findViewById(R.id.tv_display_event_name);
         TextView noteTextView = dialogView.findViewById(R.id.tv_display_note);
-        TextView startTimeTextView = dialogView.findViewById(R.id.tv_display_event_start_time);
-        TextView endTimeTextView = dialogView.findViewById(R.id.tv_display_event_end_time);
+        TextView timeTextView = dialogView.findViewById(R.id.tv_display_time);
         ImageView deleteImageView = dialogView.findViewById(R.id.iv_delete);
         ImageView editImageView = dialogView.findViewById(R.id.iv_edit);
 
         eventNameTextView.setText(weeklyEvent.getEventName());
         noteTextView.setText(weeklyEvent.getNote());
-        startTimeTextView.setText("Start time: " + weeklyEvent.getStartTime());
-        endTimeTextView.setText("End time: " + weeklyEvent.getEndTime());
+        timeTextView.setText(weeklyEvent.getStartTime() + " ~ " + weeklyEvent.getEndTime());
 
         deleteImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,51 +166,49 @@ public class WeeklyScheduleFragment extends Fragment {
                         .commit();
             }
         });
-        builder.setView(dialogView)
-                .setTitle(weeklyEvent.getEventName())
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                    }
-                });
+        builder.setView(dialogView);
         mAlertDialog = builder.create();
         mAlertDialog.show();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.add_item) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AddWeeklyEventFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
+    /**
+     * Sets up a page of weekly schedule.
+     */
     private void updateWeeklySchedule() {
-        mWeeklyScheduleGridAdapter = new WeeklyScheduleGridAdapter(mView.getContext(), mWeeklyEventList);
-        mGridView.setAdapter(mWeeklyScheduleGridAdapter);
+        WeeklyScheduleGridAdapter weeklyScheduleGridAdapter = new WeeklyScheduleGridAdapter(mView.getContext(), mWeeklyEventList);
+        mGridView.setAdapter(weeklyScheduleGridAdapter);
     }
 
+    /**
+     * Sets up weekly event list.
+     *
+     * @param weeklyEventList - list of weekly events to be set
+     */
     public void setWeeklyEventList(List<WeeklyEvent> weeklyEventList) {
         mWeeklyEventList = weeklyEventList;
         updateWeeklySchedule();
     }
 
+    /**
+     * Interface for getting weekly events.
+     */
     public interface GetWeeklyEventsListener {
+        /**
+         * Retrieve weekly events from the web service.
+         */
         void getWeeklyEvents();
     }
 
+    /**
+     * Interface for a deleting weekly event.
+     */
     public interface DeleteWeeklyEventListener {
+        /**
+         * Deleting a weekly event through
+         * posting the event id to the web service.
+         *
+         * @param eventId - weekly event's id
+         */
         void deleteWeeklyEvent(String eventId);
     }
 }

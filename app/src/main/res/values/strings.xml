@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TCSS450Team2Project</string>
+    <string name="app_name">HuskyCal</string>
 
     <!-- sharedPreferences strings -->
     <string name="LOGIN_PREFS">edu.tacoma.uw.PREFS</string>
@@ -9,6 +9,7 @@
     <!-- Navigation Drawer(menu) strings -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_rest_password">Reset Password</string>
     <string name="action_logout">Sign Out</string>
 
     <!-- SignUpFragment strings -->
@@ -19,4 +20,8 @@
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="sign_up_btn">SIGN UP</string>
+
+
+    <string name="string_reset_password">Reset Password</string>
+    <string name="string_new_password">New Password</string>
 </resources>

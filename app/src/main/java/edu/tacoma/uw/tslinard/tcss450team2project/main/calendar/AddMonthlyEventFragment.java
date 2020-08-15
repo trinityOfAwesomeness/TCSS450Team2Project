@@ -18,34 +18,28 @@ import java.util.Calendar;
 import edu.tacoma.uw.tslinard.tcss450team2project.R;
 
 /**
- * Class to create and control the Add Event page.
+ * Class to create and control the Add Monthly Event page.
  *
  * @author Seoungdeok Jeon
  * @author Tatiana Linardopoulou
  */
-public class EditEventFragment extends Fragment implements View.OnClickListener {
+public class AddMonthlyEventFragment extends Fragment implements View.OnClickListener {
 
-    private Events mEvent;
-    private EditMonthlyEventListener mEditMonthlyEventListener;
-
+    private AddMonthlyEventListener mAddMonthlyEventListener;
+    private int mYear, mMonth, mDay, mHour, mMinute;
     private EditText mStartDateEditText, mStartTimeEditText, mEndDateEditText, mEndTimeEditText,
             mEventNameEditText, mNoteEditText;
     private Button mSaveEventButton;
-    private int mYear, mMonth, mDay, mHour, mMinute;
-    private Calendar mCalendar;
 
-    public EditEventFragment(Events event){
-        mEvent = event;
-    }
     /**
-     * Called to do initial creation of AddEventFragment.
+     * Called to do initial creation of AddMonthlyEventFragment.
      *
      * @param savedInstanceState - If the fragment is being re-created from a previous saved state, this is the state.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEditMonthlyEventListener = (EditMonthlyEventListener) getActivity();
+        mAddMonthlyEventListener = (AddMonthlyEventListener) getActivity();
     }
 
     /**
@@ -60,16 +54,8 @@ public class EditEventFragment extends Fragment implements View.OnClickListener 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_event, container, false);
-        getActivity().setTitle("Edit Event");
-
-        // get today's date
-        mCalendar = Calendar.getInstance();
-        mYear = mCalendar.get(Calendar.YEAR);
-        mMonth = mCalendar.get(Calendar.MONTH);
-        mDay = mCalendar.get(Calendar.DAY_OF_MONTH);
-        mHour = mCalendar.get(Calendar.HOUR_OF_DAY);
-        mMinute = mCalendar.get(Calendar.MINUTE);
+        View view = inflater.inflate(R.layout.fragment_add_monthly_event, container, false);
+        getActivity().setTitle("Add Event");
 
         mStartDateEditText = view.findViewById(R.id.et_start_date);
         mStartTimeEditText = view.findViewById(R.id.et_start_time);
@@ -79,12 +65,18 @@ public class EditEventFragment extends Fragment implements View.OnClickListener 
         mNoteEditText = view.findViewById(R.id.et_note);
         mSaveEventButton = view.findViewById(R.id.btn_save_event);
 
-        mStartDateEditText.setText(mEvent.getStartDate());
-        mStartTimeEditText.setText(mEvent.getStartTime());
-        mEndDateEditText.setText(mEvent.getEndDate());
-        mEndTimeEditText.setText(mEvent.getEndTime());
-        mEventNameEditText.setText(mEvent.getEventName());
-        mNoteEditText.setText(mEvent.getNote());
+        // get today's date
+        Calendar calendar = Calendar.getInstance();
+        mYear = calendar.get(Calendar.YEAR);
+        mMonth = calendar.get(Calendar.MONTH);
+        mDay = calendar.get(Calendar.DAY_OF_MONTH);
+        mHour = calendar.get(Calendar.HOUR_OF_DAY);
+        mMinute = calendar.get(Calendar.MINUTE);
+
+        mStartDateEditText.setText((mMonth + 1) + "/" + mDay + "/" + mYear);
+        mStartTimeEditText.setText(String.format("%02d:%02d", mHour, mMinute));
+        mEndDateEditText.setText((mMonth + 1) + "/" + mDay + "/" + mYear);
+        mEndTimeEditText.setText(String.format("%02d:%02d", mHour, mMinute));
 
         mStartDateEditText.setOnClickListener(this);
         mStartTimeEditText.setOnClickListener(this);
@@ -95,7 +87,7 @@ public class EditEventFragment extends Fragment implements View.OnClickListener 
     }
 
     /**
-     * Actions to be done when an view is clicked
+     * Actions to be done when a view is clicked
      *
      * @param view - the clicked view
      */
@@ -149,22 +141,23 @@ public class EditEventFragment extends Fragment implements View.OnClickListener 
             String endTime = mEndTimeEditText.getText().toString();
             String eventName = mEventNameEditText.getText().toString();
             String note = mNoteEditText.getText().toString();
-
-            mEvent.setStartDate(startDate);
-            mEvent.setStartTime(startTime);
-            mEvent.setEndDate(endDate);
-            mEvent.setEndTime(endTime);
-            mEvent.setEventName(eventName);
-            mEvent.setNote(note);
-
-            if (mEditMonthlyEventListener != null) {
-                mEditMonthlyEventListener.editMonthlyEvent(mEvent);
+            MonthlyEvent monthlyEvent = new MonthlyEvent(null, startDate, startTime, endDate, endTime, eventName, note);
+            if (mAddMonthlyEventListener != null) {
+                mAddMonthlyEventListener.addMonthlyEvent(monthlyEvent);
             }
         }
     }
 
-
-    public interface EditMonthlyEventListener {
-        void editMonthlyEvent(Events event);
+    /**
+     * Interface for adding a monthly event.
+     */
+    public interface AddMonthlyEventListener {
+        /**
+         * Add a new monthly event through
+         * posting the monthly event to the web service.
+         *
+         * @param monthlyEvent - monthly event to be added
+         */
+        void addMonthlyEvent(MonthlyEvent monthlyEvent);
     }
 }

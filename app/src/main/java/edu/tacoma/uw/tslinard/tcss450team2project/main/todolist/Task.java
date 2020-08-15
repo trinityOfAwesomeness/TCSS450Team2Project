@@ -7,6 +7,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Task class for to-do-list.
+ *
+ * @author Seoungdeok Jeon
+ * @author Tatiana Linardopoulou
+ */
 public class Task {
 
     // Properties of Json object. Used to GET/POST tasks.
@@ -19,8 +25,8 @@ public class Task {
     private String mTask;
     private String mStatus;
 
-    public Task(String todoid, String task, String status) {
-        mToDoId = todoid;
+    public Task(String toDoId, String task, String status) {
+        mToDoId = toDoId;
         mTask = task;
         mStatus = status;
     }
@@ -45,10 +51,17 @@ public class Task {
         mStatus = status;
     }
 
-    public static List<Task> parseTasksJson(String eventsJson) throws JSONException {
+    /**
+     * Parse Json format and retrieve list of tasks.
+     *
+     * @param taskJson - string in Json format
+     * @return - list of tasks retrieved from Json format
+     * @throws JSONException - if input string is not in Json format
+     */
+    public static List<Task> parseTasksJson(String taskJson) throws JSONException {
         List<Task> taskList = new ArrayList<>();
-        if(eventsJson != null){
-            JSONArray arr = new JSONArray(eventsJson);
+        if(taskJson != null){
+            JSONArray arr = new JSONArray(taskJson);
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 Task task = new Task(obj.getString(Task.TO_DO_ID),
@@ -57,9 +70,5 @@ public class Task {
             }
         }
         return taskList;
-    }
-
-    public String toString(){
-        return mToDoId + " " + mTask +" " +mStatus;
     }
 }
